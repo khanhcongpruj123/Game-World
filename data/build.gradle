@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion ConfigureVersion.CompileSdkVersion
-    buildToolsVersion ConfigureVersion.BuildToolsVersion
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
-        minSdkVersion ConfigureVersion.MinSdkVersion
-        targetSdkVersion ConfigureVersion.TargetSdkVersion
+        minSdkVersion 24
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
@@ -34,6 +34,12 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    implementation "com.github.bumptech.glide:glide:4.11.0"
-    annotationProcessor "com.github.bumptech.glide:compiler:4.11.0"
+    implementation project(":common")
+    implementation project(":domain")
+
+    implementation LibrariesDependency.KOIN_ANDROID
+
+    implementation LibrariesDependency.RETROFIT_COROUTINES_ADAPTER
+    implementation LibrariesDependency.RETROFIT
+    implementation LibrariesDependency.RETROFIT_GSON_CONVERTER
 }

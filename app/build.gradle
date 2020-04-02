@@ -37,4 +37,22 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    implementation project(":domain")
+    implementation project(":data")
+    implementation project(":common")
+
+    implementation LibrariesDependency.KOIN_ANDROID
+    implementation LibrariesDependency.KOIN_ANDROID_SCROPE
+    implementation LibrariesDependency.KOIN_ANDROID_VIEWMODEL
+    implementation LibrariesDependency.KOIN_ANDROID_EXT
+
+    implementation LibrariesDependency.ANDROID_COROUTINES
+    implementation LibrariesDependency.COROUTINES_CORE
+
+    implementation LibrariesDependency.LIFECYCLE_VIEWMODEL_KTX
+    implementation LibrariesDependency.LIFECYCLE_LIVEDATA_KTX
+    
+    implementation LibrariesDependency.NAVIGATION_UI_KTX
+    implementation LibrariesDependency.NAVIGATION_FRAGMENT_KTX
 }

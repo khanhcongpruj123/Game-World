@@ -1,2 +1,5 @@
 rootProject.name='Game World'
 include ':app', ':buildSrc', ':common'
+include ':domain'
+include ':domain'
+include ':data'

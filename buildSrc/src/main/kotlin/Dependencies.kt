@@ -1,3 +1,11 @@
+
+object ConfigureVersion {
+    const val CompileSdkVersion = 29
+    const val BuildToolsVersion = "29.0.3"
+    const val MinSdkVersion = 24
+    const val TargetSdkVersion = 29
+}
+
 object LibraryVersion {
     const val RETROFIT_COROUTINES_ADAPTER = "0.9.2"
     const val GSON = "2.8.6"
