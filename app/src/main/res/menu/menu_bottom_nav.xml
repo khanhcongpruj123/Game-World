@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@id/homeFragment" android:title="@string/home" android:icon="@drawable/ic_home_black_24dp" android:iconTint="@color/gray"/>
+    <item android:id="@id/bookmarkFragment" android:title="@string/my_bookmark" android:icon="@drawable/ic_bookmark_black_24dp" android:iconTint="@color/gray"/>
+</menu>

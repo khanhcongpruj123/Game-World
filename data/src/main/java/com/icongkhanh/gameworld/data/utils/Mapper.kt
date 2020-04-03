@@ -13,10 +13,13 @@ fun GameResponse.mapToDomain(): Game {
         id = this.id?: 0,
         name = this.name?: "",
         releasedDate = this.released?: "",
+        rating = this.rating?: 0f,
+        ratingsCount = this.ratings_count?: 0,
         screenShort = this.shortScreenshots?.map { it.url?: "" }?: emptyList(),
         saturatedColor = this.saturated_color?: "#FFFFFF",
         suggestionsCount = this.suggestions_count?: 0,
         clipUrl = this.clip?.clip?: "",
+        clipPreviewUrl = this.clip?.preview?: "",
         genre = this.genres?.map { it.mapToDomain() }?: emptyList(),
         imgUrl = this.background_image?: "",
         platforms = this.platforms?.map { it.mapToDomain() }?: emptyList()

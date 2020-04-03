@@ -4,8 +4,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.icongkhanh.common.Result
 import com.icongkhanh.gameworld.data.remote.GameService
+import com.icongkhanh.gameworld.databinding.ActivityMainBinding
 import com.icongkhanh.gameworld.domain.usecase.GetTopRatingGameUsecase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,9 +21,13 @@ import org.koin.android.scope.currentScope
 
 class MainActivity : AppCompatActivity() {
 
+    lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
     }
 }

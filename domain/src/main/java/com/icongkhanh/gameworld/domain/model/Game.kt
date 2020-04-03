@@ -1,5 +1,7 @@
 package com.icongkhanh.gameworld.domain.model
 
+import android.os.Parcelable
+import java.io.Serializable
 import java.util.*
 
 data class Game(
@@ -19,6 +21,7 @@ data class Game(
     val genre: List<Genre> = emptyList(),
     val publisher: List<Publisher> = emptyList(),
     val clipUrl: String = "",
+    val clipPreviewUrl: String = "",
     val screenShort: List<String> = emptyList(),
     val saturatedColor: String = "#FFFFFF"
-)
+): Serializable

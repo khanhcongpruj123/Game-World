@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bottom_nav_height">50dp</dimen>
+    <dimen name="width_top_game_button">100dp</dimen>
+    <dimen name="height_top_game_button">50dp</dimen>
+    <dimen name="normal_margin">10dp</dimen>
+    <dimen name="size_thumbnail">50dp</dimen>
+    <dimen name="rounded_radius">100dp</dimen>
+    <dimen name="app_bar_home_height">350dp</dimen>
+</resources>

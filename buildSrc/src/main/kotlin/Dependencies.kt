@@ -73,6 +73,15 @@ object LibrariesDependency {
     //GSON
     const val GSON = "com.google.code.gson:gson:${LibraryVersion.GSON}"
 
+    //ROUNDED IMAGE
+    const val ROUNDED_IMAGE = "de.hdodenhof:circleimageview:3.1.0"
+
+    //SIMPLE VIDEO VIEw
+    const val SIMPLE_VIDEO_VIEW = "com.klinkerapps:simple_videoview:1.2.4"
+
+    //EXO PLAYER
+    const val EXO_PLAYER = "com.google.android.exoplayer:exoplayer:2.9.5"
+
 }
 
 object KAPT {

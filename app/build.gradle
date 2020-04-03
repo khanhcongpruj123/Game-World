@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: "androidx.navigation.safeargs.kotlin"
 
 apply from: "../android_common.gradle"
 
@@ -26,6 +27,10 @@ android {
         }
     }
 
+    viewBinding {
+        enabled = true
+    }
+
 }
 
 dependencies {
@@ -34,6 +39,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
@@ -41,6 +47,8 @@ dependencies {
     implementation project(":domain")
     implementation project(":data")
     implementation project(":common")
+
+    implementation LibrariesDependency.MATERIAL_DESIGN
 
     implementation LibrariesDependency.KOIN_ANDROID
     implementation LibrariesDependency.KOIN_ANDROID_SCROPE
@@ -52,7 +60,14 @@ dependencies {
 
     implementation LibrariesDependency.LIFECYCLE_VIEWMODEL_KTX
     implementation LibrariesDependency.LIFECYCLE_LIVEDATA_KTX
-    
+
     implementation LibrariesDependency.NAVIGATION_UI_KTX
     implementation LibrariesDependency.NAVIGATION_FRAGMENT_KTX
+
+    implementation LibrariesDependency.GLIDE
+    annotationProcessor AnnotationDependency.GLIDE_COMPILER
+
+    implementation LibrariesDependency.SIMPLE_VIDEO_VIEW
+
+    implementation LibrariesDependency.EXO_PLAYER
 }
