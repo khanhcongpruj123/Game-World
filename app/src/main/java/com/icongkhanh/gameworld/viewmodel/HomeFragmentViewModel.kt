@@ -1,9 +1,6 @@
 package com.icongkhanh.gameworld.viewmodel
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.icongkhanh.common.Result
 import com.icongkhanh.gameworld.domain.model.Game
 import com.icongkhanh.gameworld.domain.usecase.GetTopRatingGameUsecase
@@ -17,15 +14,23 @@ class HomeFragmentViewModel(
     getTopRatingGame: GetTopRatingGameUsecase
 ): ViewModel() {
 
-    private var _topRatingGame = MutableLiveData<List<Game>>()
-    val topRatingGame = _topRatingGame.distinctUntilChanged()
+    private var _listTopRatingGame = MutableLiveData<List<Game>>()
+    val listTopRatingGame = _listTopRatingGame.distinctUntilChanged()
+
+    private var _topRatingGame = MutableLiveData<Game>()
+    val topRatingGame : LiveData<Game> = _topRatingGame.distinctUntilChanged()
 
     init {
         viewModelScope.launch {
             getTopRatingGame().onEach {
                 when(it) {
                     is Result.Success -> {
-                        withContext(Dispatchers.Main) { _topRatingGame.value = it.data }
+                        withContext(Dispatchers.Main) {
+                            if (!it.data.isNullOrEmpty()) {
+                                _listTopRatingGame.value = it.data.subList(1, it.data.size)
+                                _topRatingGame.value = it.data[0]
+                            }
+                        }
                     }
                 }
             }.collect()

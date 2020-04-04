@@ -10,4 +10,10 @@
     <string name="buy">Buy</string>
     <string name="search">Search</string>
     <string name="setting">Setting</string>
+    <string name="point">Point</string>
+    <string name="introduce">Introduce</string>
+    <string name="screenshots">Screenshots</string>
+    <string name="genre">Genre</string>
+    <string name="requirement">Requirement</string>
+    <string name="moregame">More game</string>
 </resources>

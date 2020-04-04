@@ -7,4 +7,6 @@
     <dimen name="size_thumbnail">50dp</dimen>
     <dimen name="rounded_radius">100dp</dimen>
     <dimen name="app_bar_home_height">350dp</dimen>
+    <dimen name="size_thumbnail_large">70dp</dimen>
+    <dimen name="size_screenshot">100dp</dimen>
 </resources>

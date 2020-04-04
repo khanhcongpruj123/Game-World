@@ -1,9 +1,7 @@
-package com.icongkhanh.gameworld.widget.ListGameRecyclerView
+package com.icongkhanh.gameworld.adapter
 
 import android.content.Context
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -16,37 +14,33 @@ import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Util
 import com.icongkhanh.common.hideOrShow
 import com.icongkhanh.gameworld.databinding.ItemTopGameBinding
 import com.icongkhanh.gameworld.domain.model.Game
 
-class ListTopGameAdapter(val context: Context) : RecyclerView.Adapter<ListTopGameAdapter.GameHolder>() {
+class ListTopGameAdapter(val context: Context, val dataSourceFactory: DataSource.Factory) : RecyclerView.Adapter<ListTopGameAdapter.GameHolder>() {
 
-    val mainHandler = Handler(Looper.getMainLooper())
-    val listGame = mutableListOf<Game>()
+    private val listGame = mutableListOf<Game>()
     private var onSelected: (index: Int, game: Game) -> Unit = {i, g ->}
     var playPosition = -1
         set(value) {
             if (field != value) {
                 val oldPos = field
                 field = value
-                notifyItemChanged(field)
-                notifyItemChanged(oldPos)
+                if (oldPos != field) {
+                    notifyItemChanged(oldPos)
+                    notifyItemChanged(field)
+                }
+
             }
         }
-    val dataSourceFactory: DataSource.Factory = DefaultDataSourceFactory(context, Util.getUserAgent(context, "Game World"))
 
+    var player: SimpleExoPlayer? = null
 
     inner class GameHolder(val binding: ItemTopGameBinding): RecyclerView.ViewHolder(binding.root) {
 
-        var player: SimpleExoPlayer?
 
         init {
-            player = ExoPlayerFactory.newSimpleInstance(context)
-            player?.volume = 0f
-            binding.playView.player = player
             binding.playView.useController = false
             binding.playView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         }
@@ -76,30 +70,35 @@ class ListTopGameAdapter(val context: Context) : RecyclerView.Adapter<ListTopGam
                 onSelected(adapterPosition, game)
             }
 
-            if (playPosition == adapterPosition && oldPosition != playPosition) {
+            if (playPosition == adapterPosition) {
+                binding.root.requestFocus()
+                binding.playView.player = player
                 binding.playView.hideOrShow(true)
-                binding.thumbnailVideo.hideOrShow(false)
+                player?.addListener(object : Player.EventListener {
+                    override fun onPlayerStateChanged(
+                        playWhenReady: Boolean,
+                        playbackState: Int
+                    ) {
+                        super.onPlayerStateChanged(playWhenReady, playbackState)
+
+                        when(playbackState) {
+                            Player.STATE_ENDED -> {
+                                player?.seekTo(0)
+                            }
+                            Player.STATE_READY -> {
+                                this@GameHolder.binding.thumbnailVideo.hideOrShow(false)
+                            }
+                        }
+                    }
+                })
                 if (game.clipUrl.isNotEmpty()) {
                     val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
                         .createMediaSource(Uri.parse(game.clipUrl))
                     player?.prepare(videoSource)
                     player?.playWhenReady = true
-                    player?.addListener(object : Player.EventListener {
-                        override fun onPlayerStateChanged(
-                            playWhenReady: Boolean,
-                            playbackState: Int
-                        ) {
-                            super.onPlayerStateChanged(playWhenReady, playbackState)
-
-                            when(playbackState) {
-                                Player.STATE_ENDED -> {
-                                    player?.seekTo(0)
-                                }
-                            }
-                        }
-                    })
                 }
             } else {
+                binding.playView.player = null
                 binding.playView.hideOrShow(false)
                 binding.thumbnailVideo.hideOrShow(true)
             }
@@ -128,5 +127,16 @@ class ListTopGameAdapter(val context: Context) : RecyclerView.Adapter<ListTopGam
 
     fun setOnItemClicked(listener: (i: Int, g: Game) -> Unit) {
         onSelected = listener
+    }
+
+    fun onStop() {
+        player?.release()
+        player = null
+    }
+
+    fun onStart() {
+        player = ExoPlayerFactory.newSimpleInstance(context)
+        player?.volume = 0f
+        notifyItemChanged(playPosition)
     }
 }

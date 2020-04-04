@@ -12,4 +12,22 @@
         <item name="tint">#FFFFFF</item>
     </style>
 
+    <style name="ButtonBuyGameDetail" parent="Widget.MaterialComponents.ExtendedFloatingActionButton.Icon">
+        <item name="textAllCaps">false</item>
+        <item name="backgroundTint">#2196F3</item>
+        <item name="cornerRadius">6dp</item>
+        <item name="iconTint">@android:color/white</item>
+    </style>
+
+    <style name="WhiteBoldText" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">15dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="SubText" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">12dp</item>
+        <item name="android:textColor">@color/gray</item>
+    </style>
+
 </resources>

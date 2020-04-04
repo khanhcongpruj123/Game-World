@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#D8000000"
     xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true">
 
@@ -22,15 +23,18 @@
             app:contentScrim="@color/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
+            <ImageView
+                android:scaleType="centerCrop"
+                android:id="@+id/thumbnail_video"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
             <com.google.android.exoplayer2.ui.PlayerView
-                app:resize_mode="zoom"
-                app:repeat_toggle_modes="one"
-                app:use_controller="false"
+                android:visibility="invisible"
                 android:id="@+id/player_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
-                android:scaleType="centerCrop"
                 app:layout_collapseMode="parallax"/>
             <View
                 android:background="@drawable/gray_overlay"
@@ -146,6 +150,7 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
     <androidx.recyclerview.widget.RecyclerView
+        android:background="@drawable/corner_bordered"
         tools:listitem="@layout/item_top_game"
         android:id="@+id/list_top_game"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
