@@ -29,8 +29,10 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
         TODO("Not yet implemented")
     }
 
-    override suspend fun getGameDetail(id: Long): Flow<Result<Game>> {
-        TODO("Not yet implemented")
+    override suspend fun getGameDetail(id: Long): Flow<Result<Game>> = flow {
+        emit(Result.Loading)
+        val res = withContext(Dispatchers.IO) { gameService.getGameDetail(id) }.mapToDomain()
+        emit(Result.Success(res))
     }
 
 }
