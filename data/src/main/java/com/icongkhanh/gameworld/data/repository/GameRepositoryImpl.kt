@@ -31,7 +31,9 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
 
     override suspend fun getGameDetail(id: Long): Flow<Result<Game>> = flow {
         emit(Result.Loading)
-        val res = withContext(Dispatchers.IO) { gameService.getGameDetail(id) }.mapToDomain()
+        val _res = withContext(Dispatchers.IO) { gameService.getGameDetail(id) }
+        Log.d("Repository", "game response: ${_res}")
+        val res = _res.mapToDomain()
         emit(Result.Success(res))
     }
 

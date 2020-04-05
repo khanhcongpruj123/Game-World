@@ -82,6 +82,9 @@ object LibrariesDependency {
     //EXO PLAYER
     const val EXO_PLAYER = "com.google.android.exoplayer:exoplayer:2.9.5"
 
+    //CHIP LAYOUT MANAGER
+    const val CHIP_LAYOUT_MANAGER = "com.beloo.widget:ChipsLayoutManager:0.3.7@aar"
+
 }
 
 object KAPT {

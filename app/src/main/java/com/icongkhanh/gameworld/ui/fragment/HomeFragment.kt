@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -76,6 +77,12 @@ class HomeFragment : Fragment() {
         Log.d(TAG, "On View Created!")
 
         tabContainerViewModel.isLoading(true)
+
+        binding.detail.setOnClickListener {
+            val navController = Navigation.findNavController(requireActivity(), R.id.fragment_container)
+            val action = TabContainerFragmentDirections.actionTabContainerFragmentToGameDetailFragment(vm.topRatingGame.value!!)
+            navController.navigate(action)
+        }
 
         setupListGame()
         setupToolbar()

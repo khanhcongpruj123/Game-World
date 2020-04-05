@@ -49,5 +49,9 @@ data class GameResponse(
     @SerializedName("clip")
     val clip: Clip?,
     @SerializedName("genres")
-    val genres: List<GenreResponse>? = emptyList()
+    val genres: List<GenreResponse>? = emptyList(),
+    @SerializedName("description")
+    val description: String? = "",
+    @SerializedName("website")
+    val website: String? = ""
 )

@@ -1,23 +1,9 @@
 package com.icongkhanh.gameworld
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
-import com.icongkhanh.common.Result
-import com.icongkhanh.gameworld.data.remote.GameService
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.icongkhanh.gameworld.databinding.ActivityMainBinding
-import com.icongkhanh.gameworld.domain.usecase.GetTopRatingGameUsecase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.launch
-import org.koin.android.ext.android.get
-import org.koin.android.scope.currentScope
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,5 +15,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
+
+        window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
+
     }
 }

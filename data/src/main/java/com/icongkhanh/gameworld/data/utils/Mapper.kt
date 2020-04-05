@@ -12,6 +12,8 @@ fun GameResponse.mapToDomain(): Game {
     return Game(
         id = this.id?: 0,
         name = this.name?: "",
+        description = this.description?: "",
+        website = this.website?: "",
         releasedDate = this.released?: "",
         rating = this.rating?: 0f,
         ratingsCount = this.ratings_count?: 0,

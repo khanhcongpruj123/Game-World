@@ -70,4 +70,8 @@ dependencies {
     implementation LibrariesDependency.SIMPLE_VIDEO_VIEW
 
     implementation LibrariesDependency.EXO_PLAYER
+
+    implementation LibrariesDependency.MATERIAL_DESIGN
+
+    implementation LibrariesDependency.CHIP_LAYOUT_MANAGER
 }

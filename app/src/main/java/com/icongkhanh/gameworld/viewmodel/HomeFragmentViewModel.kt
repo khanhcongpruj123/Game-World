@@ -18,7 +18,7 @@ class HomeFragmentViewModel(
     val listTopRatingGame = _listTopRatingGame.distinctUntilChanged()
 
     private var _topRatingGame = MutableLiveData<Game>()
-    val topRatingGame : LiveData<Game> = _topRatingGame.distinctUntilChanged()
+    val topRatingGame : LiveData<Game> get() = _topRatingGame
 
     init {
         viewModelScope.launch {

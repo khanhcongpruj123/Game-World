@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".ui.fragment.GameDetailFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_home_height"
-        android:background="@android:color/transparent"
         android:fitsSystemWindows="true"
+        android:background="@android:color/transparent"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -232,6 +233,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/list_genre"
                     android:layout_marginTop="@dimen/normal_margin"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
