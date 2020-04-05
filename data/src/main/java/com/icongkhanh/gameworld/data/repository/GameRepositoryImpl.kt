@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import java.net.SocketTimeoutException
 
 class GameRepositoryImpl(val gameService: GameService): GameRepository {
 
@@ -19,10 +20,14 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
 
     override suspend fun getTopRatingGame(): Flow<Result<List<Game>>> = flow {
         emit(Result.Loading)
-        val list = withContext(Dispatchers.IO) { gameService.getAllGame() }
-        val res = list.results
-        res.sortedByDescending { it.rating }
-        emit(Result.Success(res.map { it.mapToDomain() }))
+        try {
+            val list = withContext(Dispatchers.IO) { gameService.getAllGame() }
+            val res = list.results
+            res.sortedByDescending { it.rating }
+            emit(Result.Success(res.map { it.mapToDomain() }))
+        } catch (ex: Exception) {
+            emit(Result.Error(ex))
+        }
     }
 
     override suspend fun searchGame(keyword: String): Flow<Result<List<Game>>> {
@@ -31,8 +36,12 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
 
     override suspend fun getGameDetail(id: Long): Flow<Result<Game>> = flow {
         emit(Result.Loading)
-        val res = withContext(Dispatchers.IO) { gameService.getGameDetail(id) }.mapToDomain()
-        emit(Result.Success(res))
+        try {
+            val res = withContext(Dispatchers.IO) { gameService.getGameDetail(id) }.mapToDomain()
+            emit(Result.Success(res))
+        } catch (ex: Exception) {
+            emit(Result.Error(ex))
+        }
     }
 
 }
