@@ -53,5 +53,7 @@ data class GameResponse(
     @SerializedName("description")
     val description: String? = "",
     @SerializedName("website")
-    val website: String? = ""
+    val website: String? = "",
+    @SerializedName("stores")
+    val stores: List<Stores>? = emptyList()
 )

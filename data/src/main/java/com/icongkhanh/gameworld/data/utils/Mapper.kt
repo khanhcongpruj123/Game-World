@@ -1,12 +1,10 @@
 package com.icongkhanh.gameworld.data.utils
 
-import com.icongkhanh.gameworld.data.remote.model.GameResponse
-import com.icongkhanh.gameworld.data.remote.model.GenreResponse
-import com.icongkhanh.gameworld.data.remote.model.Platform
-import com.icongkhanh.gameworld.data.remote.model.Platforms
+import com.icongkhanh.gameworld.data.remote.model.*
 import com.icongkhanh.gameworld.domain.model.Game
 import com.icongkhanh.gameworld.domain.model.Genre
 import com.icongkhanh.gameworld.domain.model.PlatformAndRequirement
+import com.icongkhanh.gameworld.domain.model.Store
 
 fun GameResponse.mapToDomain(): Game {
     return Game(
@@ -24,7 +22,17 @@ fun GameResponse.mapToDomain(): Game {
         clipPreviewUrl = this.clip?.preview?: "",
         genre = this.genres?.map { it.mapToDomain() }?: emptyList(),
         imgUrl = this.background_image?: "",
-        platforms = this.platforms?.map { it.mapToDomain() }?: emptyList()
+        platforms = this.platforms?.map { it.mapToDomain() }?: emptyList(),
+        stores = this.stores?.map { it.mapToDomain() }?: emptyList()
+    )
+}
+
+fun Stores.mapToDomain(): Store {
+    return Store(
+        id = this.store?.id?: 0L,
+        website = this.url?: "",
+        name = this.store?.name?: "",
+        imgUrl = this.store?.image_background?: ""
     )
 }
 

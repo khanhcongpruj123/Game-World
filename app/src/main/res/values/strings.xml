@@ -16,4 +16,8 @@
     <string name="genre">Genre</string>
     <string name="requirement">Requirement</string>
     <string name="moregame">More game</string>
+    <string name="minimum">Minimum</string>
+    <string name="recommend">Recommened</string>
+    <string name="home_to_search">home_to_search</string>
+    <string name="home_to_detail">home_to_detail</string>
 </resources>

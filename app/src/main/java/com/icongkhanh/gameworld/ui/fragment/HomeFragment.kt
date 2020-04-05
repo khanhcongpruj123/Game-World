@@ -1,5 +1,6 @@
 package com.icongkhanh.gameworld.ui.fragment
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -25,13 +26,13 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.icongkhanh.common.hideOrShow
 import com.icongkhanh.gameworld.R
 import com.icongkhanh.gameworld.databinding.FragmentHomeBinding
 import com.icongkhanh.gameworld.viewmodel.HomeFragmentViewModel
-import com.icongkhanh.gameworld.viewmodel.TabContainerViewModel
 import com.icongkhanh.gameworld.adapter.ListTopGameAdapter
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import com.icongkhanh.gameworld.domain.model.Game
 import org.koin.android.viewmodel.ext.android.viewModel
 
 /**
@@ -45,7 +46,6 @@ class HomeFragment : Fragment() {
 
     lateinit var binding: FragmentHomeBinding
     private val vm by viewModel<HomeFragmentViewModel>()
-    val tabContainerViewModel by sharedViewModel<TabContainerViewModel>()
     private var player: SimpleExoPlayer? = null
     lateinit var dataSourceFactory: DataSource.Factory
     lateinit var listTopGameAdapter: ListTopGameAdapter
@@ -76,13 +76,17 @@ class HomeFragment : Fragment() {
 
         Log.d(TAG, "On View Created!")
 
-        tabContainerViewModel.isLoading(true)
-
         binding.detail.setOnClickListener {
             val navController = Navigation.findNavController(requireActivity(), R.id.fragment_container)
             val action = TabContainerFragmentDirections.actionTabContainerFragmentToGameDetailFragment(vm.topRatingGame.value!!)
             navController.navigate(action)
         }
+
+        binding.buy.setOnClickListener {
+            buyGame(vm.getTopGame())
+        }
+
+        binding.toolbar.setupWithNavController(findNavController())
 
         setupListGame()
         setupToolbar()
@@ -219,9 +223,6 @@ class HomeFragment : Fragment() {
         vm.listTopRatingGame.observe(viewLifecycleOwner, Observer {listTopGame ->
             listTopGameAdapter.updateListGame(listTopGame)
 
-            //show or hide loading view
-            listTopGameCompleted = true
-            tabContainerViewModel.isLoading(!(listTopGameCompleted && topRatingGameCompleted))
         })
 
         //when top rating game changed, updated top rating game
@@ -233,12 +234,23 @@ class HomeFragment : Fragment() {
                 .load(topGame.clipPreviewUrl)
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(binding.thumbnailVideo)
+        })
 
-            if (player?.playbackState == Player.STATE_IDLE) playClipTopGame()
+        vm.isError.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                val dialog = MaterialAlertDialogBuilder(requireContext())
+                    .setMessage("No internet!")
+                    .setNegativeButton("Retry") { dialog, which ->
+                        vm.loadGame()
+                    }
+                    .setCancelable(false)
+                    .create()
+                dialog.show()
+            }
+        })
 
-            //show or hide loading view
-            topRatingGameCompleted = true
-            tabContainerViewModel.isLoading(!(listTopGameCompleted && topRatingGameCompleted))
+        vm.isLoading.observe(viewLifecycleOwner, Observer {
+            binding.loadingView.hideOrShow(it)
         })
     }
 
@@ -267,6 +279,14 @@ class HomeFragment : Fragment() {
 
     private fun stopClipTopGame() {
         player?.stop()
+    }
+
+    private fun buyGame(game: Game) {
+
+        if (game.stores.isEmpty() || game.stores[0].website.isNullOrBlank()) return
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(game.stores[0].website)
+        startActivity(intent)
     }
 
 }

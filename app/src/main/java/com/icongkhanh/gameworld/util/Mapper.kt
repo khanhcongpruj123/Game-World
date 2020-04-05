@@ -9,12 +9,16 @@ fun Game.merge(other: Game): Game {
     var description = if (this.description.isEmpty()) other.description else this.description
     var website = if (this.website.isEmpty()) other.website else this.website
     var genre = if (this.genre.isEmpty()) other.genre else this.genre
+    var platforms = if (this.platforms.isEmpty()) other.platforms else this.platforms
+    val stores = other.stores
 
     return this.copy(
         id = id,
         name = name,
         description = description,
         website = website,
-        genre = genre
+        genre = genre,
+        platforms = platforms,
+        stores = stores
     )
 }

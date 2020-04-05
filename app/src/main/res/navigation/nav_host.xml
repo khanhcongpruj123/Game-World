@@ -7,22 +7,26 @@
     <fragment
         android:id="@+id/tabContainerFragment"
         android:name="com.icongkhanh.gameworld.ui.fragment.TabContainerFragment"
-        android:label="fragment_tab_container"
+        android:label=""
         tools:layout="@layout/fragment_tab_container" >
         <action
             android:id="@+id/action_tabContainerFragment_to_gameDetailFragment"
-            app:destination="@id/gameDetailFragment" />
+            app:destination="@id/gameDetailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
         <action
             android:id="@+id/action_tabContainerFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
         <action
             android:id="@+id/action_tabContainerFragment_to_settingFragment"
-            app:destination="@id/settingFragment" />
+            app:destination="@id/settingFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/gameDetailFragment"
         android:name="com.icongkhanh.gameworld.ui.fragment.GameDetailFragment"
-        android:label="fragment_game_detail"
+        android:label=""
         tools:layout="@layout/fragment_game_detail">
         <argument android:name="gameItem"
             app:argType="com.icongkhanh.gameworld.domain.model.Game" />
@@ -30,11 +34,11 @@
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.icongkhanh.gameworld.ui.fragment.SearchFragment"
-        android:label="fragment_search"
+        android:label=""
         tools:layout="@layout/fragment_search" />
     <fragment
         android:id="@+id/settingFragment"
         android:name="com.icongkhanh.gameworld.ui.fragment.SettingFragment"
-        android:label="fragment_setting"
+        android:label=""
         tools:layout="@layout/fragment_setting" />
 </navigation>

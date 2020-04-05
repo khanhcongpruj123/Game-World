@@ -27,6 +27,7 @@ import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.google.android.material.transition.MaterialContainerTransform
 import com.icongkhanh.common.hideOrShow
 import com.icongkhanh.gameworld.adapter.ListGameDetailGenreAdapter
 import com.icongkhanh.gameworld.adapter.ListScreenshotAdapter
@@ -35,8 +36,6 @@ import com.icongkhanh.gameworld.domain.model.Game
 import com.icongkhanh.gameworld.model.GameDetailGenreUiModel
 import com.icongkhanh.gameworld.model.ScreenshotModelUi
 import com.icongkhanh.gameworld.viewmodel.GameDetailFragmentViewModel
-import com.icongkhanh.gameworld.viewmodel.TabContainerViewModel
-import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
 
@@ -51,9 +50,6 @@ class GameDetailFragment : Fragment() {
 
     //view model
     val vm by viewModel<GameDetailFragmentViewModel>()
-
-    //tab view model
-    val tabContainerViewModel by sharedViewModel<TabContainerViewModel>()
 
     //view binding
     lateinit var binding: FragmentGameDetailBinding
@@ -92,7 +88,10 @@ class GameDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        tabContainerViewModel.isLoading(true)
+
+        binding.buy.setOnClickListener {
+            buyGame(vm.getCurrentGame())
+        }
 
         setupToolbar()
         setupOnBackPress()
@@ -101,14 +100,19 @@ class GameDetailFragment : Fragment() {
         subscribeUi()
     }
 
+    private fun buyGame(game: Game) {
+
+        Log.d(TAG, "game website: ${game.stores[0]}")
+
+        if (game.stores.isEmpty() || game.stores[0].website.isNullOrBlank()) return
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(game.stores[0].website)
+        startActivity(intent)
+    }
+
     fun subscribeUi() {
 
         vm.game.observe(viewLifecycleOwner, Observer {game ->
-
-            Log.d(TAG, "game: $game")
-
-            //description
-            binding.desciption.text = Html.fromHtml(game.description, Html.FROM_HTML_MODE_COMPACT)
 
             screenshotAdapter.update(game?.screenShort?.map {
                 ScreenshotModelUi(
@@ -131,7 +135,8 @@ class GameDetailFragment : Fragment() {
 
             // info game
             displayInfoGame(game)
-            tabContainerViewModel.isLoading(false)
+
+            playClipGame()
         })
     }
 
@@ -155,7 +160,7 @@ class GameDetailFragment : Fragment() {
         super.onStart()
 
         setupPlayer()
-        playClipTopGame()
+        playClipGame()
     }
 
     private fun setupPlayer() {
@@ -186,8 +191,19 @@ class GameDetailFragment : Fragment() {
     }
 
     private fun displayInfoGame(game: Game) {
+
+        //name game
         binding.nameGame.text = game?.name
+
+        //star point
         binding.starPoint.text = game?.rating.toString()
+
+        //description
+        binding.desciption.text = Html.fromHtml(game.description, Html.FROM_HTML_MODE_COMPACT)
+
+        //requirement
+        binding.minimum.text = Html.fromHtml(game?.platforms[0].requirementMin, Html.FROM_HTML_MODE_COMPACT)
+        binding.recommend.text = Html.fromHtml(game?.platforms[0].requirementRecommended, Html.FROM_HTML_MODE_COMPACT)
 
         Glide.with(this)
             .load(game?.clipPreviewUrl)
@@ -202,7 +218,6 @@ class GameDetailFragment : Fragment() {
 
     fun setupToolbar() {
         binding.toolbar.setupWithNavController(findNavController())
-        binding.toolbar.title = ""
     }
 
     fun setupOnBackPress() {
@@ -221,9 +236,9 @@ class GameDetailFragment : Fragment() {
         player = null
     }
 
-    fun playClipTopGame() {
+    fun playClipGame() {
         if (player?.playbackState == Player.STATE_IDLE) {
-            val path = vm.game.value?.clipUrl
+            val path = vm.getCurrentGame().clipUrl
             path?.let {
                 val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(path))

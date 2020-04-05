@@ -19,6 +19,9 @@ class GameDetailFragmentViewModel(
     private var _game = MutableLiveData<Game>()
     val game : LiveData<Game> = _game.distinctUntilChanged()
 
+    private var _isError = MutableLiveData<Boolean>()
+    val isError : LiveData<Boolean> = _isError.distinctUntilChanged()
+
     fun loadGameDetail() {
         viewModelScope.launch {
             Log.d("ViewModel", "${_game.value}")
@@ -30,8 +33,14 @@ class GameDetailFragmentViewModel(
                             is Result.Success -> withContext(Dispatchers.Main) {
                                 val data = it.data
                                 data?.let {
-                                    _game.value = _game.value?.merge(data)
+                                    Log.d("GameDetailVM", "before: ${it.stores?.get(0)?.website}")
+                                    val afterMerge = _game.value?.merge(it)
+                                    Log.d("GameDetailVM", "after: ${afterMerge?.stores?.get(0)?.website}")
+                                    _game.value = afterMerge
                                 }
+                            }
+                            is Result.Error -> withContext(Dispatchers.Main) {
+
                             }
                         }
                     }.collect()
@@ -43,4 +52,6 @@ class GameDetailFragmentViewModel(
         _game.value = game
         loadGameDetail()
     }
+
+    fun getCurrentGame() = _game.value!!
 }

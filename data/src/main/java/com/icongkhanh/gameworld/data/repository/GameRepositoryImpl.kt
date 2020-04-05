@@ -19,10 +19,14 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
 
     override suspend fun getTopRatingGame(): Flow<Result<List<Game>>> = flow {
         emit(Result.Loading)
-        val list = withContext(Dispatchers.IO) { gameService.getAllGame() }
-        val res = list.results
-        res.sortedByDescending { it.rating }
-        emit(Result.Success(res.map { it.mapToDomain() }))
+        try {
+            val list = withContext(Dispatchers.IO) { gameService.getAllGame() }
+            val res = list.results
+            res.sortedByDescending { it.rating }
+            emit(Result.Success(res.map { it.mapToDomain() }))
+        } catch (ex: Exception) {
+            emit(Result.Error(ex))
+        }
     }
 
     override suspend fun searchGame(keyword: String): Flow<Result<List<Game>>> {
@@ -31,10 +35,17 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
 
     override suspend fun getGameDetail(id: Long): Flow<Result<Game>> = flow {
         emit(Result.Loading)
-        val _res = withContext(Dispatchers.IO) { gameService.getGameDetail(id) }
-        Log.d("Repository", "game response: ${_res}")
-        val res = _res.mapToDomain()
-        emit(Result.Success(res))
+        try {
+            val res = withContext(Dispatchers.IO) {
+                val _res = gameService.getGameDetail(id)
+                Log.d("Repository", "${_res.stores?.get(0)}")
+                _res
+            }.mapToDomain()
+            Log.d("Repository", "${res.stores?.get(0)}")
+            emit(Result.Success(res))
+        } catch (ex: Exception) {
+            emit(Result.Error(ex))
+        }
     }
 
 }

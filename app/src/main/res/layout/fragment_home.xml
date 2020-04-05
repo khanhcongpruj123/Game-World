@@ -4,8 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D8000000"
+    style="@style/Theme.MaterialComponents"
     xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true">
+
+    <RelativeLayout
+        android:elevation="10dp"
+        android:background="@android:color/white"
+        android:id="@+id/loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ProgressBar
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_layout"
@@ -24,6 +37,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
+                android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
                 android:id="@+id/thumbnail_video"
                 android:layout_width="match_parent"
@@ -111,6 +125,7 @@
                     </LinearLayout>
                     <com.google.android.material.button.MaterialButton
                         android:textAllCaps="false"
+                        android:id="@+id/buy"
                         android:backgroundTint="@color/colorPrimary"
                         android:text="@string/buy"
                         app:cornerRadius="10dp"
