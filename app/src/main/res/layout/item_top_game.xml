@@ -27,16 +27,21 @@
 
     <TextView
         android:id="@+id/genre"
-        app:layout_constraintTop_toBottomOf="@id/name_game"
-        app:layout_constraintLeft_toLeftOf="@id/name_game"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="@dimen/normal_margin"
+        app:layout_constraintBottom_toBottomOf="@id/thumbnail"
+        app:layout_constraintRight_toLeftOf="@id/rating_layout"
+        app:layout_constraintLeft_toRightOf="@+id/thumbnail"
+        app:layout_constraintTop_toBottomOf="@id/name_game" />
 
     <LinearLayout
         android:id="@+id/start_point"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/thumbnail"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_width="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/rating_layout"
+        app:layout_constraintLeft_toRightOf="@id/name_game"
         android:layout_height="wrap_content">
         <ImageView
             android:layout_gravity="center"
@@ -55,12 +60,13 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
     <LinearLayout
-        app:layout_constraintBottom_toTopOf="@id/frame_layout"
+        android:id="@+id/rating_layout"
+        app:layout_constraintBottom_toBottomOf="@id/thumbnail"
         app:layout_constraintTop_toBottomOf="@id/start_point"
         app:layout_constraintRight_toRightOf="parent"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="0dp">
+        android:layout_height="match_parent">
         <TextView
             android:layout_gravity="top"
             android:id="@+id/rating_count"
