@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D8000000"
-    style="@style/Theme.MaterialComponents"
     xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true">
 

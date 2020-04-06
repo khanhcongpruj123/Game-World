@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    style="@style/Theme.MaterialComponents"
     tools:context=".ui.fragment.GameDetailFragment">
 
     <com.google.android.material.appbar.AppBarLayout
