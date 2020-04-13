@@ -17,10 +17,10 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
         val list = withContext(Dispatchers.IO) { gameService.getAllGame() }
     }
 
-    override suspend fun getTopRatingGame(): Flow<Result<List<Game>>> = flow {
+    override suspend fun getTopRatingGame(page: Long): Flow<Result<List<Game>>> = flow {
         emit(Result.Loading)
         try {
-            val list = withContext(Dispatchers.IO) { gameService.getAllGame() }
+            val list = withContext(Dispatchers.IO) { gameService.getAllGame(page) }
             val res = list.results
             res.sortedByDescending { it.rating }
             emit(Result.Success(res.map { it.mapToDomain() }))

@@ -4,10 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#D8000000"
+    android:animateLayoutChanges="true"
     xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true">
 
     <RelativeLayout
+        android:visibility="gone"
         android:elevation="10dp"
         android:background="@android:color/white"
         android:id="@+id/loading_view"
@@ -20,6 +22,7 @@
     </RelativeLayout>
 
     <com.google.android.material.appbar.AppBarLayout
+        style="@style/AppBarLayout"
         android:id="@+id/app_bar_layout"
         android:background="@android:color/transparent"
         android:layout_width="match_parent"
@@ -31,6 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
+            app:statusBarScrim="@color/colorAccent"
             app:contentScrim="@color/colorAccent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
@@ -156,6 +160,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.Toolbar
+                style="@style/Toolbar"
                 app:menu="@menu/menu_tool_bar"
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -173,6 +178,8 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:clipChildren="false"
+            android:transitionGroup="false"
             android:background="@drawable/corner_bordered"
             tools:listitem="@layout/item_top_game"
             android:id="@+id/list_top_game"

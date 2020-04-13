@@ -14,7 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Fade
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -27,12 +27,13 @@ import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.icongkhanh.common.hideOrShow
+import com.icongkhanh.common.event.EventObserver
+import com.icongkhanh.common.showOrHide
 import com.icongkhanh.gameworld.R
-import com.icongkhanh.gameworld.databinding.FragmentHomeBinding
-import com.icongkhanh.gameworld.viewmodel.HomeFragmentViewModel
 import com.icongkhanh.gameworld.adapter.ListTopGameAdapter
+import com.icongkhanh.gameworld.databinding.FragmentHomeBinding
 import com.icongkhanh.gameworld.domain.model.Game
+import com.icongkhanh.gameworld.viewmodel.HomeFragmentViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
 /**
@@ -49,14 +50,18 @@ class HomeFragment : Fragment() {
     private var player: SimpleExoPlayer? = null
     lateinit var dataSourceFactory: DataSource.Factory
     lateinit var listTopGameAdapter: ListTopGameAdapter
+    lateinit var linearLayoutManager: LinearLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        enterTransition = Fade()
 
         dataSourceFactory = DefaultDataSourceFactory(
             context, Util.getUserAgent(context, "Game World")
         )
 
+        vm.start()
     }
 
 
@@ -73,18 +78,6 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        Log.d(TAG, "On View Created!")
-
-        binding.detail.setOnClickListener {
-            val navController = Navigation.findNavController(requireActivity(), R.id.fragment_container)
-            val action = TabContainerFragmentDirections.actionTabContainerFragmentToGameDetailFragment(vm.topRatingGame.value!!)
-            navController.navigate(action)
-        }
-
-        binding.buy.setOnClickListener {
-            buyGame(vm.getTopGame())
-        }
 
         binding.toolbar.setupWithNavController(findNavController())
 
@@ -111,12 +104,12 @@ class HomeFragment : Fragment() {
                         player?.seekTo(0)
                     }
                     Player.STATE_READY -> {
-                        binding.thumbnailVideo.hideOrShow(false)
-                        binding.playerView.hideOrShow(true)
+                        binding.thumbnailVideo.showOrHide(false)
+                        binding.playerView.showOrHide(true)
                     }
                     Player.STATE_IDLE -> {
-                        binding.thumbnailVideo.hideOrShow(true)
-                        binding.playerView.hideOrShow(false)
+                        binding.thumbnailVideo.showOrHide(true)
+                        binding.playerView.showOrHide(false)
                     }
                 }
             }
@@ -129,8 +122,6 @@ class HomeFragment : Fragment() {
 
         //play clip top game
         playClipTopGame()
-
-        listTopGameAdapter.onStart()
     }
 
     private fun setupTopGame() {
@@ -162,53 +153,11 @@ class HomeFragment : Fragment() {
                 dataSourceFactory
             )
 
-        listTopGameAdapter.setOnItemClicked { i, g ->
-            val navController = Navigation.findNavController(requireActivity(), R.id.fragment_container)
-            val action = TabContainerFragmentDirections.actionTabContainerFragmentToGameDetailFragment(g)
-            navController.navigate(action)
-        }
-
+        linearLayoutManager = LinearLayoutManager(requireContext())
         binding.listTopGame.apply {
             adapter = listTopGameAdapter
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager = linearLayoutManager
         }
-
-        //notify current position focus and play game clip
-        binding.listTopGame.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-            }
-
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    val startPosition = layoutManager.findFirstVisibleItemPosition()
-                    val endPosition = layoutManager.findLastVisibleItemPosition()
-
-                    val isStartOfList = !recyclerView.canScrollVertically(-1)
-                    val canScrollUp = recyclerView.canScrollVertically(1)
-                    val canScrollDown = recyclerView.canScrollVertically(-1)
-                    val isEndOfList = !recyclerView.canScrollVertically(1)
-
-                    Log.d(TAG, "${canScrollDown} ${canScrollUp}")
-
-                    val targetPosition = when {
-                        canScrollDown && canScrollUp && startPosition == 0 -> 0
-                        isStartOfList -> -1
-                        isEndOfList -> listTopGameAdapter.itemCount - 1
-                        else -> startPosition
-                    }
-
-                    if (targetPosition == -1) playClipTopGame()
-                    else stopClipTopGame()
-
-                    listTopGameAdapter.playPosition = targetPosition
-
-                }
-            }
-        })
     }
 
     /**
@@ -216,19 +165,44 @@ class HomeFragment : Fragment() {
      * */
     private fun subscribeUi() {
 
-        var listTopGameCompleted = false
-        var topRatingGameCompleted = false
+        vm.navigateToGameDetail.observe(viewLifecycleOwner, EventObserver {
+            val navController =
+                Navigation.findNavController(requireActivity(), R.id.fragment_container)
+            val action =
+                TabContainerFragmentDirections.actionTabContainerFragmentToGameDetailFragment(it)
+            navController.navigate(action)
+        })
+
+        vm.navigateToBuyGame.observe(viewLifecycleOwner, EventObserver {
+            buyGame(it)
+        })
 
         //when list top rating game changed, updated list game
-        vm.listTopRatingGame.observe(viewLifecycleOwner, Observer {listTopGame ->
-            listTopGameAdapter.updateListGame(listTopGame)
+        vm.listTopRatingGameUiModel.observe(viewLifecycleOwner, Observer { listTopGame ->
+            listTopGame ?: return@Observer
 
+            binding.listTopGame.post {
+                listTopGameAdapter.submitList(listTopGame.list)
+            }
         })
 
         //when top rating game changed, updated top rating game
-        vm.topRatingGame.observe(viewLifecycleOwner, Observer {topGame ->
-            binding.nameTopGame.text = topGame.name
-            binding.starPointTopGameTv.text = topGame.rating.toString()
+        vm.topRatingGameUiModel.observe(viewLifecycleOwner, Observer { topGame ->
+            topGame ?: return@Observer
+
+            playClipTopGame()
+
+            binding.nameTopGame.text = topGame.nameGame
+
+            binding.starPointTopGameTv.text = topGame.starPoint.toString()
+
+            binding.detail.setOnClickListener {
+                topGame.onClickDetail()
+            }
+
+            binding.buy.setOnClickListener {
+                topGame.onClickBuy()
+            }
 
             Glide.with(this)
                 .load(topGame.clipPreviewUrl)
@@ -236,7 +210,7 @@ class HomeFragment : Fragment() {
                 .into(binding.thumbnailVideo)
         })
 
-        vm.isError.observe(viewLifecycleOwner, Observer {
+        vm.isError.observe(viewLifecycleOwner, EventObserver {
             if (it) {
                 val dialog = MaterialAlertDialogBuilder(requireContext())
                     .setMessage("No internet!")
@@ -249,8 +223,8 @@ class HomeFragment : Fragment() {
             }
         })
 
-        vm.isLoading.observe(viewLifecycleOwner, Observer {
-            binding.loadingView.hideOrShow(it)
+        vm.isLoading.observe(viewLifecycleOwner, EventObserver {
+            binding.loadingView.showOrHide(it)
         })
     }
 
@@ -267,7 +241,7 @@ class HomeFragment : Fragment() {
     fun playClipTopGame() {
         Log.d(TAG, "Play clip")
         if (player?.playbackState == Player.STATE_IDLE) {
-            val path = vm.topRatingGame.value?.clipUrl
+            val path = vm.getTopGame()?.clipUrl
             path?.let {
                 val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(path))

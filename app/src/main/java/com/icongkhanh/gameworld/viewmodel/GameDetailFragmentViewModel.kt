@@ -3,6 +3,7 @@ package com.icongkhanh.gameworld.viewmodel
 import android.util.Log
 import androidx.lifecycle.*
 import com.icongkhanh.common.Result
+import com.icongkhanh.common.event.Event
 import com.icongkhanh.gameworld.domain.model.Game
 import com.icongkhanh.gameworld.domain.usecase.GetGameDetailUsecase
 import com.icongkhanh.gameworld.util.merge
@@ -19,12 +20,12 @@ class GameDetailFragmentViewModel(
     private var _game = MutableLiveData<Game>()
     val game : LiveData<Game> = _game.distinctUntilChanged()
 
-    private var _isError = MutableLiveData<Boolean>()
-    val isError : LiveData<Boolean> = _isError.distinctUntilChanged()
+    private var _isError = MutableLiveData<Event<Boolean>>(Event(false))
+    val isError: LiveData<Event<Boolean>>
+        get() = _isError
 
     fun loadGameDetail() {
         viewModelScope.launch {
-            Log.d("ViewModel", "${_game.value}")
             val id = _game.value?.id
             id?.let {
                 getGameDetail(it)
@@ -40,7 +41,7 @@ class GameDetailFragmentViewModel(
                                 }
                             }
                             is Result.Error -> withContext(Dispatchers.Main) {
-
+                                _isError.value = Event(true)
                             }
                         }
                     }.collect()

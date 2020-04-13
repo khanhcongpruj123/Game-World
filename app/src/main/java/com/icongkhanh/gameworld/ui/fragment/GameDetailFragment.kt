@@ -5,17 +5,18 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Html
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Slide
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -27,8 +28,7 @@ import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
-import com.google.android.material.transition.MaterialContainerTransform
-import com.icongkhanh.common.hideOrShow
+import com.icongkhanh.common.showOrHide
 import com.icongkhanh.gameworld.adapter.ListGameDetailGenreAdapter
 import com.icongkhanh.gameworld.adapter.ListScreenshotAdapter
 import com.icongkhanh.gameworld.databinding.FragmentGameDetailBinding
@@ -69,6 +69,10 @@ class GameDetailFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        enterTransition = Slide().apply {
+            duration = 500
+        }
 
         dataSourceFactory = DefaultDataSourceFactory(
             context, Util.getUserAgent(context, "Game World")
@@ -172,8 +176,8 @@ class GameDetailFragment : Fragment() {
 
                 when (playbackState) {
                     Player.STATE_READY -> {
-                        binding.thumbnailVideo.hideOrShow(false)
-                        binding.playerView.hideOrShow(true)
+                        binding.thumbnailVideo.showOrHide(false)
+                        binding.playerView.showOrHide(true)
                     }
                 }
             }

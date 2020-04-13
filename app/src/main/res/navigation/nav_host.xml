@@ -11,17 +11,13 @@
         tools:layout="@layout/fragment_tab_container" >
         <action
             android:id="@+id/action_tabContainerFragment_to_gameDetailFragment"
-            app:destination="@id/gameDetailFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
+            app:destination="@id/gameDetailFragment" />
         <action
             android:id="@+id/action_tabContainerFragment_to_searchFragment"
             app:destination="@id/searchFragment" />
         <action
             android:id="@+id/action_tabContainerFragment_to_settingFragment"
-            app:destination="@id/settingFragment"
-            app:enterAnim="@anim/nav_default_enter_anim"
-            app:exitAnim="@anim/nav_default_exit_anim" />
+            app:destination="@id/settingFragment" />
     </fragment>
     <fragment
         android:id="@+id/gameDetailFragment"

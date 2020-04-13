@@ -11,8 +11,8 @@
         <item name="fontFamily">@font/poppins</item>
     </style>
 
-    <style name="Toolbar" parent="ThemeOverlay.AppCompat.Light">
-        <item name="tint">#FFFFFF</item>
+    <style name="Toolbar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">
+        <item name="android:statusBarColor">@color/colorAccent</item>
     </style>
 
     <style name="ButtonBuyGameDetail" parent="Widget.MaterialComponents.ExtendedFloatingActionButton.Icon">
@@ -23,13 +23,13 @@
     </style>
 
     <style name="WhiteBoldText" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textSize">15dp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
 
     <style name="SubText" parent="Widget.MaterialComponents.TextView">
-        <item name="android:textSize">12dp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/gray</item>
     </style>
 
@@ -37,6 +37,10 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:statusBarColor">#00FFFFFF</item>
         <item name="fontFamily">@font/poppins</item>
+    </style>
+
+    <style name="AppBarLayout" parent="Widget.MaterialComponents.AppBarLayout.Primary">
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
 </resources>
