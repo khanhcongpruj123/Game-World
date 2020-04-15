@@ -34,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:contentScrim="@color/colorAccent"
+            app:contentScrim="@color/blue"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
@@ -178,6 +178,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:clipChildren="false"
+            android:backgroundTint="@color/blue"
             android:transitionGroup="false"
             android:background="@drawable/corner_bordered"
             tools:listitem="@layout/item_top_game"
