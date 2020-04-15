@@ -29,7 +29,7 @@ class ListScreenshotAdapter (val context: Context): RecyclerView.Adapter<ListScr
 
             //on click
             binding.root.setOnClickListener {
-                item.onClick(item.url)
+                item.onClick()
             }
         }
     }

@@ -3,29 +3,24 @@ package com.icongkhanh.gameworld.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.icongkhanh.gameworld.R
 import com.icongkhanh.gameworld.databinding.ItemGenreGameDetailBinding
-import com.icongkhanh.gameworld.databinding.ItemScreenshotBinding
-import com.icongkhanh.gameworld.model.GameDetailGenreUiModel
-import com.icongkhanh.gameworld.model.ScreenshotModelUi
+import com.icongkhanh.gameworld.model.ItemGenreUiModel
 
-class ListGameDetailGenreAdapter (val context: Context): RecyclerView.Adapter<ListGameDetailGenreAdapter.GameDetailGenreHolder>() {
-
-    private val listScreenShotUrl = mutableListOf<GameDetailGenreUiModel>()
+class ListGameDetailGenreAdapter(val context: Context) :
+    ListAdapter<ItemGenreUiModel, ListGameDetailGenreAdapter.GameDetailGenreHolder>(GenreDiff) {
 
     inner class GameDetailGenreHolder(val binding: ItemGenreGameDetailBinding): RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: GameDetailGenreUiModel) {
+        fun bind(item: ItemGenreUiModel) {
 
-            binding.genre.text = item.genre.name
+            binding.genre.text = item.name
 
             //on click
             binding.root.setOnClickListener {
-                item.onClick(item.genre)
+                item.onClick()
             }
         }
     }
@@ -35,17 +30,25 @@ class ListGameDetailGenreAdapter (val context: Context): RecyclerView.Adapter<Li
         return GameDetailGenreHolder(binding)
     }
 
-    override fun getItemCount(): Int {
-        return listScreenShotUrl.size
-    }
-
     override fun onBindViewHolder(holder: GameDetailGenreHolder, position: Int) {
-        holder.bind(listScreenShotUrl[position])
+        holder.bind(getItem(position))
     }
 
-    fun update(list: List<GameDetailGenreUiModel>) {
-        listScreenShotUrl.clear()
-        listScreenShotUrl.addAll(list)
-        notifyDataSetChanged()
+    object GenreDiff : DiffUtil.ItemCallback<ItemGenreUiModel>() {
+
+        override fun areItemsTheSame(
+            oldItem: ItemGenreUiModel,
+            newItem: ItemGenreUiModel
+        ): Boolean {
+            return oldItem.name.equals(newItem.name)
+        }
+
+        override fun areContentsTheSame(
+            oldItem: ItemGenreUiModel,
+            newItem: ItemGenreUiModel
+        ): Boolean {
+            return oldItem == newItem
+        }
+
     }
 }

@@ -28,13 +28,13 @@ import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.icongkhanh.common.event.EventObserver
 import com.icongkhanh.common.showOrHide
 import com.icongkhanh.gameworld.adapter.ListGameDetailGenreAdapter
 import com.icongkhanh.gameworld.adapter.ListScreenshotAdapter
 import com.icongkhanh.gameworld.databinding.FragmentGameDetailBinding
 import com.icongkhanh.gameworld.domain.model.Game
-import com.icongkhanh.gameworld.model.GameDetailGenreUiModel
-import com.icongkhanh.gameworld.model.ScreenshotModelUi
+import com.icongkhanh.gameworld.model.GameDetailUiModel
 import com.icongkhanh.gameworld.viewmodel.GameDetailFragmentViewModel
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -116,32 +116,49 @@ class GameDetailFragment : Fragment() {
 
     fun subscribeUi() {
 
-        vm.game.observe(viewLifecycleOwner, Observer {game ->
+        vm.gameUiModel.observe(viewLifecycleOwner, Observer { game ->
 
-            screenshotAdapter.update(game?.screenShort?.map {
-                ScreenshotModelUi(
-                    it
-                ) { url ->
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.setType("image/*")
-                    intent.data = Uri.parse(url)
-                    startActivity(intent)
-                }
-            }?: emptyList())
+            screenshotAdapter
 
-            gameDetailGenreAdapter.update(game?.genre?.map {
-                GameDetailGenreUiModel(
-                    it
-                ) {
-
-                }
-            }?: emptyList())
+            gameDetailGenreAdapter.submitList(game.listGenre)
 
             // info game
             displayInfoGame(game)
 
+            // setup listener
+            setupListener(game)
+
             playClipGame()
         })
+
+        vm.navigateToBuy.observe(viewLifecycleOwner, EventObserver {
+            buyGame(it)
+        })
+
+        vm.navigateToViewClip.observe(viewLifecycleOwner, EventObserver {
+            navigateToViewClip(it)
+        })
+
+        vm.navigateToViewImage.observe(viewLifecycleOwner, EventObserver {
+            navigateToViewImage(it)
+        })
+    }
+
+    private fun navigateToViewImage(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setType("image/*")
+        intent.data = Uri.parse(url)
+        startActivity(intent)
+    }
+
+    private fun setupListener(game: GameDetailUiModel) {
+        binding.buy.setOnClickListener {
+            game.onClickBuy()
+        }
+
+        binding.playerView.setOnClickListener {
+            game.onClickClip()
+        }
     }
 
     private fun setupListScreenshot() {
@@ -184,37 +201,29 @@ class GameDetailFragment : Fragment() {
         })
 
         binding.playerView.player = player
-        binding.playerView.setOnClickListener {
-            vm.game.value?.clipUrl?.let {
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.setType("video/*")
-                intent.data = Uri.parse(it)
-                startActivity(intent)
-            }
-        }
     }
 
-    private fun displayInfoGame(game: Game) {
+    private fun displayInfoGame(game: GameDetailUiModel) {
 
         //name game
-        binding.nameGame.text = game?.name
+        binding.nameGame.text = game.name
 
         //star point
-        binding.starPoint.text = game?.rating.toString()
+        binding.starPoint.text = game.rating.toString()
 
         //description
         binding.desciption.text = Html.fromHtml(game.description, Html.FROM_HTML_MODE_COMPACT)
 
         //requirement
-        binding.minimum.text = Html.fromHtml(game?.platforms[0].requirementMin, Html.FROM_HTML_MODE_COMPACT)
-        binding.recommend.text = Html.fromHtml(game?.platforms[0].requirementRecommended, Html.FROM_HTML_MODE_COMPACT)
+        binding.minimum.text = Html.fromHtml(game.requirement, Html.FROM_HTML_MODE_COMPACT)
+        binding.recommend.text = Html.fromHtml(game.recommened, Html.FROM_HTML_MODE_COMPACT)
 
         Glide.with(this)
-            .load(game?.clipPreviewUrl)
+            .load(game.clipPreviewUrl)
             .into(binding.thumbnailVideo)
 
         Glide.with(this)
-            .load(game?.imgUrl)
+            .load(game.imgUrl)
             .transform(RoundedCorners(100))
             .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.thumbnail)
@@ -240,7 +249,7 @@ class GameDetailFragment : Fragment() {
         player = null
     }
 
-    fun playClipGame() {
+    private fun playClipGame() {
         if (player?.playbackState == Player.STATE_IDLE) {
             val path = vm.getCurrentGame().clipUrl
             path?.let {
@@ -250,6 +259,13 @@ class GameDetailFragment : Fragment() {
                 player?.playWhenReady = true
             }
         }
+    }
+
+    private fun navigateToViewClip(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setType("video/*")
+        intent.data = Uri.parse(url)
+        startActivity(intent)
     }
 
 }
