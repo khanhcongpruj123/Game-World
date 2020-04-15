@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
@@ -30,7 +31,9 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.icongkhanh.common.event.EventObserver
 import com.icongkhanh.common.showOrHide
+import com.icongkhanh.gameworld.R
 import com.icongkhanh.gameworld.adapter.ListGameDetailGenreAdapter
+import com.icongkhanh.gameworld.adapter.ListMoreGameAdapter
 import com.icongkhanh.gameworld.adapter.ListScreenshotAdapter
 import com.icongkhanh.gameworld.databinding.FragmentGameDetailBinding
 import com.icongkhanh.gameworld.domain.model.Game
@@ -66,6 +69,7 @@ class GameDetailFragment : Fragment() {
     //ui
     lateinit var screenshotAdapter: ListScreenshotAdapter
     lateinit var gameDetailGenreAdapter: ListGameDetailGenreAdapter
+    lateinit var moreGameAdapter: ListMoreGameAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,8 +104,19 @@ class GameDetailFragment : Fragment() {
         setupToolbar()
         setupOnBackPress()
         setupListScreenshot()
+        setupListMoregame()
         setupGenre()
         subscribeUi()
+    }
+
+    private fun setupListMoregame() {
+        moreGameAdapter = ListMoreGameAdapter()
+        binding.listMoregame.apply {
+            layoutManager = LinearLayoutManager(requireContext()).apply {
+                orientation = RecyclerView.HORIZONTAL
+            }
+            adapter = moreGameAdapter
+        }
     }
 
     private fun buyGame(game: Game) {
@@ -122,6 +137,8 @@ class GameDetailFragment : Fragment() {
 
             gameDetailGenreAdapter.submitList(game.listGenre)
 
+            screenshotAdapter.update(game.listScreenShot)
+
             // info game
             displayInfoGame(game)
 
@@ -129,6 +146,10 @@ class GameDetailFragment : Fragment() {
             setupListener(game)
 
             playClipGame()
+        })
+
+        vm.listMoreGameUiModel.observe(viewLifecycleOwner, Observer {
+            moreGameAdapter.submitList(it)
         })
 
         vm.navigateToBuy.observe(viewLifecycleOwner, EventObserver {
@@ -142,6 +163,17 @@ class GameDetailFragment : Fragment() {
         vm.navigateToViewImage.observe(viewLifecycleOwner, EventObserver {
             navigateToViewImage(it)
         })
+
+        vm.navigateToDetail.observe(viewLifecycleOwner, EventObserver {
+            navigateToDetail(it)
+        })
+    }
+
+    private fun navigateToDetail(it: Game) {
+        val navController =
+            Navigation.findNavController(requireActivity(), R.id.fragment_container)
+        val action = GameDetailFragmentDirections.actionGameDetailFragmentSelf(it)
+        navController.navigate(action)
     }
 
     private fun navigateToViewImage(url: String) {

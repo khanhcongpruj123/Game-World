@@ -9,4 +9,5 @@ interface GameRepository {
     suspend fun getTopRatingGame(page: Long = 1): Flow<Result<List<Game>>>
     suspend fun searchGame(keyword: String): Flow<Result<List<Game>>>
     suspend fun getGameDetail(id: Long): Flow<Result<Game>>
+    suspend fun getGameOfGenre(genreId: Long): Flow<Result<List<Game>>>
 }

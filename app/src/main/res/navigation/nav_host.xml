@@ -26,6 +26,9 @@
         tools:layout="@layout/fragment_game_detail">
         <argument android:name="gameItem"
             app:argType="com.icongkhanh.gameworld.domain.model.Game" />
+        <action
+            android:id="@+id/action_gameDetailFragment_self"
+            app:destination="@id/gameDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/searchFragment"

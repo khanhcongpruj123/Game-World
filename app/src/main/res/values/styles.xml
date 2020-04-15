@@ -8,7 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:statusBarColor">#00FFFFFF</item>
-        <item name="fontFamily">@font/poppins</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:fontFamily">@font/poppins</item>
     </style>
 
     <style name="Toolbar" parent="ThemeOverlay.MaterialComponents.Toolbar.Primary">

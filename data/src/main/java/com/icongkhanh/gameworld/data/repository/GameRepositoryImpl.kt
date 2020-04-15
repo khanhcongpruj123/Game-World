@@ -48,4 +48,20 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
         }
     }
 
+    override suspend fun getGameOfGenre(genreId: Long): Flow<Result<List<Game>>> = flow {
+        emit(Result.Loading)
+        try {
+            val res = withContext(Dispatchers.IO) {
+                val page = (1..20).random()
+                val _res = gameService.getAllGame(page.toLong())
+                _res
+            }.results.map { it.mapToDomain() }.filter {
+                it.genre.map { it.id }.contains(genreId)
+            }
+            emit(Result.Success(res))
+        } catch (ex: Exception) {
+            emit(Result.Error(ex))
+        }
+    }
+
 }

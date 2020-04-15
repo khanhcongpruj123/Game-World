@@ -9,6 +9,7 @@ data class GameDetailUiModel(
     val description: String = "",
     val listScreenShot: List<ScreenshotModelUi> = emptyList(),
     val listGenre: List<ItemGenreUiModel> = emptyList(),
+    val listMoregame: List<ItemMoreGameUiModel> = emptyList(),
     val requirement: String = "",
     val recommened: String = "",
     val onClickBookMark: () -> Unit,
@@ -23,5 +24,11 @@ data class ItemScreenShotUiModel(
 
 data class ItemGenreUiModel(
     val name: String,
+    val onClick: () -> Unit
+)
+
+data class ItemMoreGameUiModel(
+    val name: String,
+    val imgUrl: String,
     val onClick: () -> Unit
 )

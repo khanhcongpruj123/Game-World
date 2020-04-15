@@ -7,8 +7,10 @@ import com.icongkhanh.common.event.Event
 import com.icongkhanh.gameworld.domain.model.Game
 import com.icongkhanh.gameworld.domain.model.Genre
 import com.icongkhanh.gameworld.domain.usecase.GetGameDetailUsecase
+import com.icongkhanh.gameworld.domain.usecase.GetGameOfGenreUsecase
 import com.icongkhanh.gameworld.model.GameDetailUiModel
 import com.icongkhanh.gameworld.model.ItemGenreUiModel
+import com.icongkhanh.gameworld.model.ItemMoreGameUiModel
 import com.icongkhanh.gameworld.model.ScreenshotModelUi
 import com.icongkhanh.gameworld.util.merge
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +20,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class GameDetailFragmentViewModel(
-    val getGameDetail: GetGameDetailUsecase
+    val getGameDetail: GetGameDetailUsecase,
+    val getGameOfGenre: GetGameOfGenreUsecase
 ) : ViewModel() {
 
     private var _game = MutableLiveData<Game>()
@@ -27,6 +30,7 @@ class GameDetailFragmentViewModel(
         get() = _game.map {
             GameDetailUiModel(
                 name = it.name,
+                rating = it.rating,
                 imgUrl = it.imgUrl,
                 clipUrl = it.clipUrl,
                 clipPreviewUrl = it.clipPreviewUrl,
@@ -61,6 +65,20 @@ class GameDetailFragmentViewModel(
             )
         }
 
+    private var _listMoreGame = MutableLiveData<List<Game>>()
+    val listMoreGameUiModel: LiveData<List<ItemMoreGameUiModel>>
+        get() = _listMoreGame.map {
+            it.map {
+                ItemMoreGameUiModel(
+                    name = it.name,
+                    imgUrl = it.imgUrl,
+                    onClick = {
+                        emitNavigateToDetail(it)
+                    }
+                )
+            }
+        }
+
     private var _isError = MutableLiveData<Event<Boolean>>(Event(false))
     val isError: LiveData<Event<Boolean>>
         get() = _isError
@@ -85,6 +103,10 @@ class GameDetailFragmentViewModel(
     private var _navigateToViewClip = MutableLiveData<Event<String>>()
     val navigateToViewClip: LiveData<Event<String>>
         get() = _navigateToViewClip
+
+    private var _navigateToDetail = MutableLiveData<Event<Game>>()
+    val navigateToDetail: LiveData<Event<Game>>
+        get() = _navigateToDetail
 
     fun loadGameDetail() {
         viewModelScope.launch {
@@ -114,6 +136,20 @@ class GameDetailFragmentViewModel(
     fun initial(game: Game) {
         _game.value = game
         loadGameDetail()
+        loadMoreGame()
+    }
+
+    private fun loadMoreGame() {
+        viewModelScope.launch {
+            val idGenre = getCurrentGame().genre.firstOrNull()?.id
+            idGenre?.let {
+                getGameOfGenre(idGenre).onEach {
+                    if (it is Result.Success) {
+                        withContext(Dispatchers.Main) { _listMoreGame.value = it.data }
+                    }
+                }.collect()
+            }
+        }
     }
 
     fun getCurrentGame() = _game.value!!
@@ -136,5 +172,9 @@ class GameDetailFragmentViewModel(
 
     private fun emitNavigateToViewClip(url: String) {
         _navigateToViewClip.value = Event(url)
+    }
+
+    private fun emitNavigateToDetail(game: Game) {
+        _navigateToDetail.value = Event(game)
     }
 }
