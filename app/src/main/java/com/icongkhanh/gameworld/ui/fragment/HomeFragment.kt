@@ -55,7 +55,7 @@ class HomeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enterTransition = Fade()
+        reenterTransition = Fade()
 
         dataSourceFactory = DefaultDataSourceFactory(
             context, Util.getUserAgent(context, "Game World")
@@ -84,7 +84,6 @@ class HomeFragment : Fragment() {
         setupListGame()
         setupToolbar()
         setupTopGame()
-
         subscribeUi()
     }
 
@@ -120,7 +119,6 @@ class HomeFragment : Fragment() {
 
         //bind player to list top game
 
-        //play clip top game
         playClipTopGame()
     }
 
@@ -181,9 +179,9 @@ class HomeFragment : Fragment() {
         vm.listTopRatingGameUiModel.observe(viewLifecycleOwner, Observer { listTopGame ->
             listTopGame ?: return@Observer
 
-            binding.listTopGame.post {
+            binding.listTopGame.postDelayed({
                 listTopGameAdapter.submitList(listTopGame.list)
-            }
+            }, 100)
         })
 
         //when top rating game changed, updated top rating game
@@ -239,16 +237,22 @@ class HomeFragment : Fragment() {
     }
 
     fun playClipTopGame() {
-        Log.d(TAG, "Play clip")
-        if (player?.playbackState == Player.STATE_IDLE) {
-            val path = vm.getTopGame()?.clipUrl
-            path?.let {
-                val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(Uri.parse(path))
-                player?.prepare(videoSource)
-                player?.playWhenReady = true
+
+        binding.playerView.postDelayed({
+            Log.d(TAG, "Play clip")
+            if (player?.playbackState == Player.STATE_IDLE) {
+                val path = vm.getTopGame()?.clipUrl
+                path?.let {
+                    val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(Uri.parse(path))
+                    Thread {
+                        player?.prepare(videoSource)
+                    }.start()
+                    player?.playWhenReady = true
+                }
             }
-        }
+        }, 200)
+
     }
 
     private fun stopClipTopGame() {

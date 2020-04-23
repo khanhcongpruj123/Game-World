@@ -17,9 +17,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.Slide
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
@@ -74,10 +72,6 @@ class GameDetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enterTransition = Slide().apply {
-            duration = 500
-        }
-
         dataSourceFactory = DefaultDataSourceFactory(
             context, Util.getUserAgent(context, "Game World")
         )
@@ -106,6 +100,7 @@ class GameDetailFragment : Fragment() {
         setupListScreenshot()
         setupListMoregame()
         setupGenre()
+
         subscribeUi()
     }
 
@@ -114,6 +109,7 @@ class GameDetailFragment : Fragment() {
         binding.listMoregame.apply {
             layoutManager = LinearLayoutManager(requireContext()).apply {
                 orientation = RecyclerView.HORIZONTAL
+                layoutAnimation
             }
             adapter = moreGameAdapter
         }
@@ -145,7 +141,9 @@ class GameDetailFragment : Fragment() {
             // setup listener
             setupListener(game)
 
-            playClipGame()
+            binding.playerView.postDelayed({
+                playClipGame()
+            }, 200)
         })
 
         vm.listMoreGameUiModel.observe(viewLifecycleOwner, Observer {
@@ -244,21 +242,26 @@ class GameDetailFragment : Fragment() {
         binding.starPoint.text = game.rating.toString()
 
         //description
-        binding.desciption.text = Html.fromHtml(game.description, Html.FROM_HTML_MODE_COMPACT)
+        binding.introduce.setContent(
+            Html.fromHtml(game.description, Html.FROM_HTML_MODE_COMPACT).toString()
+        )
 
         //requirement
         binding.minimum.text = Html.fromHtml(game.requirement, Html.FROM_HTML_MODE_COMPACT)
         binding.recommend.text = Html.fromHtml(game.recommened, Html.FROM_HTML_MODE_COMPACT)
 
-        Glide.with(this)
-            .load(game.clipPreviewUrl)
-            .into(binding.thumbnailVideo)
+        binding.thumbnailVideo.postDelayed({
+            Glide.with(this)
+                .load(game.clipPreviewUrl)
+                .into(binding.thumbnailVideo)
+        }, 100)
 
-        Glide.with(this)
-            .load(game.imgUrl)
-            .transform(RoundedCorners(100))
-            .transition(DrawableTransitionOptions.withCrossFade())
-            .into(binding.thumbnail)
+        binding.thumbnail.postDelayed({
+            Glide.with(this)
+                .load(game.imgUrl)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(binding.thumbnail)
+        }, 100)
     }
 
     fun setupToolbar() {

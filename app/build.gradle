@@ -65,7 +65,7 @@ dependencies {
     implementation LibrariesDependency.NAVIGATION_FRAGMENT_KTX
 
     implementation LibrariesDependency.GLIDE
-    annotationProcessor AnnotationDependency.GLIDE_COMPILER
+    kapt AnnotationDependency.GLIDE_COMPILER
 
     implementation LibrariesDependency.SIMPLE_VIDEO_VIEW
 

@@ -177,9 +177,8 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:clipChildren="false"
+            android:layoutAnimation="@anim/layout_fall_down"
             android:backgroundTint="@color/blue"
-            android:transitionGroup="false"
             android:background="@drawable/corner_bordered"
             tools:listitem="@layout/item_top_game"
             android:id="@+id/list_top_game"

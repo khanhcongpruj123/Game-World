@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.icongkhanh.gameworld.R
 import com.icongkhanh.gameworld.databinding.ItemScreenshotBinding
@@ -20,12 +19,14 @@ class ListScreenshotAdapter (val context: Context): RecyclerView.Adapter<ListScr
         fun bind(item: ScreenshotModelUi) {
 
             val size = context.resources.getDimensionPixelSize(R.dimen.size_screenshot)
-            Glide.with(context)
-                .load(item.url)
-                .transform(RoundedCorners(100))
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .override(size, size)
-                .into(binding.itemScreenshot)
+
+            binding.itemScreenshot.postDelayed({
+                Glide.with(context)
+                    .load(item.url)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .override(size, size)
+                    .into(binding.itemScreenshot)
+            }, 1000)
 
             //on click
             binding.root.setOnClickListener {

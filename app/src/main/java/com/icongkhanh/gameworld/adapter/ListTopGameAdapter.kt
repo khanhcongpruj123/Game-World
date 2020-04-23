@@ -9,11 +9,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DataSource
 import com.icongkhanh.common.showOrHide
 import com.icongkhanh.gameworld.databinding.ItemTopGameBinding
@@ -37,13 +34,13 @@ class ListTopGameAdapter(val context: Context, val dataSourceFactory: DataSource
             }
         }
 
-    var player: SimpleExoPlayer? = null
+//    var player: SimpleExoPlayer? = null
 
     inner class GameHolder(val binding: ItemTopGameBinding): RecyclerView.ViewHolder(binding.root) {
 
         init {
-            binding.playView.useController = false
-            binding.playView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+//            binding.playView.useController = false
+//            binding.playView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
         }
 
         fun bind(game: ItemTopGameUiModel) {
@@ -59,14 +56,20 @@ class ListTopGameAdapter(val context: Context, val dataSourceFactory: DataSource
             binding.starPointTv.text = game.rating.toString()
             binding.ratingCount.text = game.ratingCount.toString()
 
-            Glide.with(context)
-                .load(game.clipPreviewUrl)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(binding.thumbnailVideo)
-            Glide.with(context)
-                .load(game.thumbnailUrl)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(binding.thumbnail)
+
+            binding.thumbnailVideo.postDelayed({
+                Glide.with(context)
+                    .load(game.clipPreviewUrl)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(binding.thumbnailVideo)
+            }, 100)
+
+            binding.thumbnail.postDelayed({
+                Glide.with(context)
+                    .load(game.thumbnailUrl)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(binding.thumbnail)
+            }, 100)
 
             binding.root.setOnClickListener {
                 game.onClick()
@@ -74,37 +77,41 @@ class ListTopGameAdapter(val context: Context, val dataSourceFactory: DataSource
 
             if (playPosition == adapterPosition) {
                 binding.root.requestFocus()
-                binding.playView.player = player
-                binding.playView.showOrHide(true)
-                player?.addListener(object : Player.EventListener {
-                    override fun onPlayerStateChanged(
-                        playWhenReady: Boolean,
-                        playbackState: Int
-                    ) {
-                        super.onPlayerStateChanged(playWhenReady, playbackState)
-
-                        when(playbackState) {
-                            Player.STATE_ENDED -> {
-                                player?.seekTo(0)
-                            }
-                            Player.STATE_READY -> {
-                                this@GameHolder.binding.thumbnailVideo.showOrHide(false)
-                            }
-                        }
-                    }
-                })
+//                binding.playView.player = player
+//                binding.playView.showOrHide(true)
+//                player?.addListener(object : Player.EventListener {
+//                    override fun onPlayerStateChanged(
+//                        playWhenReady: Boolean,
+//                        playbackState: Int
+//                    ) {
+//                        super.onPlayerStateChanged(playWhenReady, playbackState)
+//
+//                        when(playbackState) {
+//                            Player.STATE_ENDED -> {
+//                                player?.seekTo(0)
+//                            }
+//                            Player.STATE_READY -> {
+//                                this@GameHolder.binding.thumbnailVideo.showOrHide(false)
+//                            }
+//                        }
+//                    }
+//                })
                 if (game.clipUrl.isNotEmpty()) {
                     val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
                         .createMediaSource(Uri.parse(game.clipUrl))
-                    player?.prepare(videoSource)
-                    player?.playWhenReady = true
+//                    player?.prepare(videoSource)
+//                    player?.playWhenReady = true
                 }
             } else {
-                binding.playView.player = null
-                binding.playView.showOrHide(false)
+//                binding.playView.player = null
+//                binding.playView.showOrHide(false)
                 binding.thumbnailVideo.showOrHide(true)
             }
         }
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
     }
 
     object GameDiff : DiffUtil.ItemCallback<ItemTopGameUiModel>() {
@@ -135,8 +142,8 @@ class ListTopGameAdapter(val context: Context, val dataSourceFactory: DataSource
     }
 
     fun onStop() {
-        player?.release()
-        player = null
+//        player?.release()
+//        player = null
     }
 
 }
