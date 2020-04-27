@@ -7,12 +7,13 @@ import kotlinx.coroutines.flow.Flow
 
 interface GetTopRatingGameUsecase {
 
-    operator suspend fun invoke(page: Long): Flow<Result<List<Game>>>
+    operator suspend fun invoke(): Flow<Result<List<Game>>>
 }
 
 class GetTopRatingGameUsecaseImpl(val repository: GameRepository): GetTopRatingGameUsecase {
 
-    override suspend fun invoke(page: Long): Flow<Result<List<Game>>> {
+    override suspend fun invoke(): Flow<Result<List<Game>>> {
+        val page = (1L..20).random()
         return repository.getTopRatingGame(page)
     }
 

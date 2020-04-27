@@ -14,7 +14,8 @@ import kotlinx.coroutines.withContext
 class GameRepositoryImpl(val gameService: GameService): GameRepository {
 
     override suspend fun getAllGame(): Flow<Result<List<Game>>> = flow {
-        val list = withContext(Dispatchers.IO) { gameService.getAllGame() }
+        val page = (1L..20).random()
+        val list = withContext(Dispatchers.IO) { gameService.getAllGame(page) }
     }
 
     override suspend fun getTopRatingGame(page: Long): Flow<Result<List<Game>>> = flow {

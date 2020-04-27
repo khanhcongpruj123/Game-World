@@ -91,7 +91,7 @@ class HomeFragmentViewModel(
                 _isLoading.value = Event(true)
             }
             //loading list top game
-            getTopRatingGame(page).onEach {
+            getTopRatingGame().onEach {
                 when(it) {
                     is Result.Success -> {
                         withContext(Dispatchers.Main) {
