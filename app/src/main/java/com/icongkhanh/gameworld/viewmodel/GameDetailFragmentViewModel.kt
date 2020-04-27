@@ -31,6 +31,8 @@ class GameDetailFragmentViewModel(
             GameDetailUiModel(
                 name = it.name,
                 rating = it.rating,
+                reviewCount = it.ratingsCount,
+                suggestionCount = it.suggestionsCount,
                 imgUrl = it.imgUrl,
                 clipUrl = it.clipUrl,
                 clipPreviewUrl = it.clipPreviewUrl,

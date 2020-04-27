@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
@@ -235,6 +234,10 @@ class GameDetailFragment : Fragment() {
 
     private fun displayInfoGame(game: GameDetailUiModel) {
 
+        binding.reviewCount.text = game.reviewCount.toString()
+
+        binding.suggestionCount.text = game.suggestionCount.toString()
+
         //name game
         binding.nameGame.text = game.name
 
@@ -270,10 +273,10 @@ class GameDetailFragment : Fragment() {
 
     fun setupOnBackPress() {
 
-        val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
-            findNavController().navigateUp()
-            true
-        }
+//        val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
+//            findNavController().navigateUp()
+//            true
+//        }
 
     }
 

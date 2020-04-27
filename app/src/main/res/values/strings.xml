@@ -20,4 +20,6 @@
     <string name="recommend">Recommened</string>
     <string name="home_to_search">home_to_search</string>
     <string name="home_to_detail">home_to_detail</string>
+    <string name="review_count">Review Count</string>
+    <string name="suggestion_count">Suggestion Count</string>
 </resources>

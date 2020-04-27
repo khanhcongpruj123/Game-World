@@ -3,10 +3,14 @@ package com.icongkhanh.gameworld.data.repository
 import android.util.Log
 import com.icongkhanh.common.Result
 import com.icongkhanh.gameworld.data.remote.GameService
+import com.icongkhanh.gameworld.data.remote.model.GameResponse
+import com.icongkhanh.gameworld.data.remote.model.SearchGame
+import com.icongkhanh.gameworld.data.utils.StringUtils
 import com.icongkhanh.gameworld.data.utils.mapToDomain
 import com.icongkhanh.gameworld.domain.model.Game
 import com.icongkhanh.gameworld.domain.repository.GameRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -30,8 +34,45 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
         }
     }
 
-    override suspend fun searchGame(keyword: String): Flow<Result<List<Game>>> {
-        TODO("Not yet implemented")
+    @ExperimentalCoroutinesApi
+    override suspend fun searchGame(keyword: String): Flow<Result<List<Game>>> = flow {
+        emit(Result.Loading)
+        try {
+            val list = withContext(Dispatchers.IO) {
+                val list1 = gameService.getAllGame(1).results
+                val list2 = gameService.getAllGame(2).results
+                val list3 = gameService.getAllGame(3).results
+                val list4 = gameService.getAllGame(4).results
+                val list5 = gameService.getAllGame(5).results
+                val list6 = gameService.getAllGame(6).results
+                val list = mutableListOf<GameResponse>()
+
+                list.addAll(list1)
+                list.addAll(list2)
+                list.addAll(list3)
+                list.addAll(list4)
+                list.addAll(list5)
+                list.addAll(list6)
+                list
+            }
+            val res = list.map { game ->
+                var percent = game.name?.let { StringUtils.similarity(it, keyword) }
+                if (percent == null) percent = 0.0
+                SearchGame(percent, game.mapToDomain())
+            }
+            var res1 = res.filter {
+                it.percent > 0.01
+            }
+            res1 = res1.sortedByDescending {
+                it.percent
+            }
+            Log.d("AppLog", res1.map { it.percent }.toString())
+            emit(Result.Success(res1.map {
+                it.game
+            }))
+        } catch (ex: Exception) {
+            emit(Result.Error(ex))
+        }
     }
 
     override suspend fun getGameDetail(id: Long): Flow<Result<Game>> = flow {

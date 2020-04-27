@@ -51,6 +51,7 @@
 
 
             <androidx.appcompat.widget.Toolbar
+                style="@style/Toolbar_Dark"
                 app:title=""
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -134,9 +135,10 @@
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_weight="1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content">
                     <TextView
+                        android:id="@+id/review_count"
                         android:layout_gravity="center"
                         style="@style/WhiteBoldText"
                         android:text="9.6"
@@ -145,14 +147,14 @@
                     <TextView
                         android:layout_gravity="center"
                         style="@style/SubText"
-                        android:text="@string/point"
+                        android:text="@string/review_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_weight="1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content">
                     <TextView
                         android:id="@+id/star_point"
@@ -171,9 +173,10 @@
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_weight="1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content">
                     <TextView
+                        android:id="@+id/suggestion_count"
                         android:layout_gravity="center"
                         style="@style/WhiteBoldText"
                         android:text="9.6"
@@ -182,7 +185,7 @@
                     <TextView
                         android:layout_gravity="center"
                         style="@style/SubText"
-                        android:text="@string/point"
+                        android:text="@string/suggestion_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>

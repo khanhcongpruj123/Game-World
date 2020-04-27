@@ -22,7 +22,6 @@
     </RelativeLayout>
 
     <com.google.android.material.appbar.AppBarLayout
-        style="@style/AppBarLayout"
         android:id="@+id/app_bar_layout"
         android:background="@android:color/transparent"
         android:layout_width="match_parent"
@@ -159,7 +158,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.appcompat.widget.Toolbar
-                style="@style/Toolbar"
                 app:menu="@menu/menu_tool_bar"
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"

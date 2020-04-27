@@ -17,7 +17,8 @@
             app:destination="@id/searchFragment" />
         <action
             android:id="@+id/action_tabContainerFragment_to_settingFragment"
-            app:destination="@id/settingFragment" />
+            app:destination="@id/settingFragment"
+            app:popUpTo="@id/tabContainerFragment" />
     </fragment>
     <fragment
         android:id="@+id/gameDetailFragment"
@@ -34,7 +35,11 @@
         android:id="@+id/searchFragment"
         android:name="com.icongkhanh.gameworld.ui.fragment.SearchFragment"
         android:label=""
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_searchFragment_to_gameDetailFragment"
+            app:destination="@id/gameDetailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/settingFragment"
         android:name="com.icongkhanh.gameworld.ui.fragment.SettingFragment"

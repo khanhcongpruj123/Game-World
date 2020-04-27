@@ -3,6 +3,7 @@ package com.icongkhanh.gameworld.model
 data class GameDetailUiModel(
     val name: String = "",
     val rating: Float = 0F,
+    val reviewCount: Long = 0L,
     val imgUrl: String = "",
     val clipUrl: String = "",
     val clipPreviewUrl: String = "",
@@ -14,7 +15,8 @@ data class GameDetailUiModel(
     val recommened: String = "",
     val onClickBookMark: () -> Unit,
     val onClickBuy: () -> Unit,
-    val onClickClip: () -> Unit
+    val onClickClip: () -> Unit,
+    val suggestionCount: Long = 0
 )
 
 data class ItemScreenShotUiModel(
