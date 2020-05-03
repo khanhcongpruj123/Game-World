@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 29
@@ -42,4 +43,8 @@ dependencies {
     implementation LibrariesDependency.RETROFIT_COROUTINES_ADAPTER
     implementation LibrariesDependency.RETROFIT
     implementation LibrariesDependency.RETROFIT_GSON_CONVERTER
+
+    implementation LibrariesDependency.ROOM_RUNTIME
+    implementation LibrariesDependency.ROOM_KTX
+    kapt KAPT.ROOM_KAPT
 }

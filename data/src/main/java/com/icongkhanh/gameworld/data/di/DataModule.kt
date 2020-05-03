@@ -5,5 +5,5 @@ import com.icongkhanh.gameworld.domain.repository.GameRepository
 import org.koin.dsl.module
 
 val dataModule = module {
-    factory { GameRepositoryImpl(get()) as GameRepository }
+    factory { GameRepositoryImpl(get(), get()) as GameRepository }
 }

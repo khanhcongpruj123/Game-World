@@ -62,3 +62,20 @@ fun GenreResponse.mapToDomain(): Genre {
         imgUrl = this.image_background?: ""
     )
 }
+
+fun Game.mapToLocalModel(): com.icongkhanh.gameworld.data.local.entity.Game {
+    return com.icongkhanh.gameworld.data.local.entity.Game(
+        this.id,
+        this.name,
+        this.imgUrl,
+        this.rating
+    )
+}
+
+fun com.icongkhanh.gameworld.data.local.entity.Game.mapToDomainModel() = Game(
+    id = this.id,
+    name = this.name,
+    imgUrl = this.imgUrl,
+    rating = this.rating,
+    isBookmark = true
+)

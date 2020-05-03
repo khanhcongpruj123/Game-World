@@ -1,5 +1,6 @@
 package com.icongkhanh.gameworld.viewmodel.di
 
+import com.icongkhanh.gameworld.viewmodel.BookmarkFragmentViewModel
 import com.icongkhanh.gameworld.viewmodel.GameDetailFragmentViewModel
 import com.icongkhanh.gameworld.viewmodel.HomeFragmentViewModel
 import com.icongkhanh.gameworld.viewmodel.SearchFragmentViewModel
@@ -8,6 +9,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel { HomeFragmentViewModel(get(), get()) }
-    viewModel { GameDetailFragmentViewModel(get(), get()) }
+    viewModel { GameDetailFragmentViewModel(get(), get(), get(), get()) }
     viewModel { SearchFragmentViewModel(get()) }
+    viewModel { BookmarkFragmentViewModel(get()) }
 }

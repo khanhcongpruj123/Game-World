@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
@@ -33,7 +34,11 @@ import com.icongkhanh.gameworld.R
 import com.icongkhanh.gameworld.adapter.ListTopGameAdapter
 import com.icongkhanh.gameworld.databinding.FragmentHomeBinding
 import com.icongkhanh.gameworld.domain.model.Game
+import com.icongkhanh.gameworld.util.LogTool
 import com.icongkhanh.gameworld.viewmodel.HomeFragmentViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.viewmodel.ext.android.viewModel
 
 /**
@@ -60,8 +65,6 @@ class HomeFragment : Fragment() {
         dataSourceFactory = DefaultDataSourceFactory(
             context, Util.getUserAgent(context, "Game World")
         )
-
-        vm.start()
     }
 
 
@@ -81,10 +84,14 @@ class HomeFragment : Fragment() {
 
         binding.toolbar.setupWithNavController(findNavController())
 
+
         setupListGame()
         setupToolbar()
         setupTopGame()
-        subscribeUi()
+        lifecycleScope.launch(Dispatchers.Main) {
+            delay(250)
+            subscribeUi()
+        }
     }
 
     override fun onStart() {
@@ -181,7 +188,7 @@ class HomeFragment : Fragment() {
 
             binding.listTopGame.postDelayed({
                 listTopGameAdapter.submitList(listTopGame.list)
-            }, 100)
+            }, 80)
         })
 
         //when top rating game changed, updated top rating game
@@ -202,10 +209,12 @@ class HomeFragment : Fragment() {
                 topGame.onClickBuy()
             }
 
-            Glide.with(this)
-                .load(topGame.clipPreviewUrl)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .into(binding.thumbnailVideo)
+            binding.thumbnailVideo.postDelayed({
+                Glide.with(this)
+                    .load(topGame.clipPreviewUrl)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(binding.thumbnailVideo)
+            }, 200)
         })
 
         vm.isError.observe(viewLifecycleOwner, EventObserver {
@@ -215,7 +224,7 @@ class HomeFragment : Fragment() {
                     .setNegativeButton("Retry") { dialog, which ->
                         vm.loadGame()
                     }
-                    .setCancelable(false)
+                    .setCancelable(true)
                     .create()
                 dialog.show()
             }
@@ -230,6 +239,7 @@ class HomeFragment : Fragment() {
      * release exo player of fragment and exoplayer of list game
      * */
     override fun onStop() {
+        LogTool.d("AppLog", "Stop!")
         super.onStop()
         player?.release()
         player = null
@@ -245,9 +255,9 @@ class HomeFragment : Fragment() {
                 path?.let {
                     val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
                         .createMediaSource(Uri.parse(path))
-                    Thread {
+                    lifecycleScope.launch(Dispatchers.Main) {
                         player?.prepare(videoSource)
-                    }.start()
+                    }
                     player?.playWhenReady = true
                 }
             }

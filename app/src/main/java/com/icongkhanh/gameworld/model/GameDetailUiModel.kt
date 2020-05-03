@@ -16,7 +16,8 @@ data class GameDetailUiModel(
     val onClickBookMark: () -> Unit,
     val onClickBuy: () -> Unit,
     val onClickClip: () -> Unit,
-    val suggestionCount: Long = 0
+    val suggestionCount: Long = 0,
+    val isBookmark: Boolean = false
 )
 
 data class ItemScreenShotUiModel(

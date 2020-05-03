@@ -4,12 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.Html
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -34,15 +34,17 @@ import com.icongkhanh.gameworld.adapter.ListMoreGameAdapter
 import com.icongkhanh.gameworld.adapter.ListScreenshotAdapter
 import com.icongkhanh.gameworld.databinding.FragmentGameDetailBinding
 import com.icongkhanh.gameworld.domain.model.Game
+import com.icongkhanh.gameworld.model.BookMarkGameDetailState
 import com.icongkhanh.gameworld.model.GameDetailUiModel
 import com.icongkhanh.gameworld.viewmodel.GameDetailFragmentViewModel
+import kotlinx.coroutines.delay
 import org.koin.android.viewmodel.ext.android.viewModel
 
 
 /**
  * A simple [Fragment] subclass.
  */
-class GameDetailFragment : Fragment() {
+class GameDetailFragment() : Fragment() {
 
     companion object {
         private val TAG = "GameDetailFragment"
@@ -75,7 +77,10 @@ class GameDetailFragment : Fragment() {
             context, Util.getUserAgent(context, "Game World")
         )
 
-        vm.initial(args.gameItem)
+        lifecycleScope.launchWhenCreated {
+            delay(1000)
+            vm.initial(args.gameItem)
+        }
     }
 
     override fun onCreateView(
@@ -89,10 +94,6 @@ class GameDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.buy.setOnClickListener {
-            buyGame(vm.getCurrentGame())
-        }
 
         setupToolbar()
         setupOnBackPress()
@@ -114,9 +115,9 @@ class GameDetailFragment : Fragment() {
         }
     }
 
-    private fun buyGame(game: Game) {
+    private fun buyGame(game: Game?) {
 
-        Log.d(TAG, "game website: ${game.stores[0]}")
+        if (game == null) return
 
         if (game.stores.isEmpty() || game.stores[0].website.isNullOrBlank()) return
         val intent = Intent(Intent.ACTION_VIEW)
@@ -127,8 +128,6 @@ class GameDetailFragment : Fragment() {
     fun subscribeUi() {
 
         vm.gameUiModel.observe(viewLifecycleOwner, Observer { game ->
-
-            screenshotAdapter
 
             gameDetailGenreAdapter.submitList(game.listGenre)
 
@@ -164,6 +163,16 @@ class GameDetailFragment : Fragment() {
         vm.navigateToDetail.observe(viewLifecycleOwner, EventObserver {
             navigateToDetail(it)
         })
+
+        vm.bookMark.observe(viewLifecycleOwner, Observer {
+            if (it == BookMarkGameDetailState.UnBookMarkMode) {
+                binding.bookmark.setBackgroundColor(context!!.getColor(R.color.gray))
+                binding.bookmark.text = context!!.getString(R.string.unbookmark)
+            } else {
+                binding.bookmark.text = context!!.getString(R.string.bookmark)
+                binding.bookmark.setBackgroundColor(context!!.getColor(R.color.colorAccent))
+            }
+        })
     }
 
     private fun navigateToDetail(it: Game) {
@@ -183,6 +192,10 @@ class GameDetailFragment : Fragment() {
     private fun setupListener(game: GameDetailUiModel) {
         binding.buy.setOnClickListener {
             game.onClickBuy()
+        }
+
+        binding.bookmark.setOnClickListener {
+            game.onClickBookMark()
         }
 
         binding.playerView.setOnClickListener {
@@ -265,6 +278,12 @@ class GameDetailFragment : Fragment() {
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(binding.thumbnail)
         }, 100)
+
+        binding.bookmark.post {
+            if (game.isBookmark) binding.bookmark.setBackgroundColor(context!!.getColor(R.color.gray))
+            else binding.bookmark.setBackgroundColor(context!!.getColor(R.color.colorAccent))
+        }
+
     }
 
     fun setupToolbar() {
@@ -289,7 +308,7 @@ class GameDetailFragment : Fragment() {
 
     private fun playClipGame() {
         if (player?.playbackState == Player.STATE_IDLE) {
-            val path = vm.getCurrentGame().clipUrl
+            val path = vm.getCurrentGame()?.clipUrl
             path?.let {
                 val videoSource: MediaSource = ExtractorMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(path))

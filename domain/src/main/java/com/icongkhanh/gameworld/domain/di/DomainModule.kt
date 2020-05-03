@@ -9,4 +9,7 @@ val domainModule = module {
     factory { GetTopRatingGameUsecaseImpl(get()) as GetTopRatingGameUsecase }
     factory { SearchGameUsecaseImpl(get()) as SearchGameUsecase }
     factory { GetGameOfGenreUsecaseImpl(get()) as GetGameOfGenreUsecase }
+    factory { BookMarkGameUsecaseImpl(get()) as BookmarkGameUsecase }
+    factory { UnBookMarkUsecaseImpl(get()) as UnBookMarkGameUsecase }
+    factory { GetAllBookmarkGameUsecaseImpl(get()) as GetAllBookmarkGameUsecase }
 }

@@ -22,4 +22,5 @@
     <string name="home_to_detail">home_to_detail</string>
     <string name="review_count">Review Count</string>
     <string name="suggestion_count">Suggestion Count</string>
+    <string name="unbookmark">Unbookmark</string>
 </resources>

@@ -1,17 +1,16 @@
 package com.icongkhanh.gameworld.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.icongkhanh.common.Result
 import com.icongkhanh.common.event.Event
 import com.icongkhanh.gameworld.domain.model.Game
 import com.icongkhanh.gameworld.domain.model.Genre
+import com.icongkhanh.gameworld.domain.usecase.BookmarkGameUsecase
 import com.icongkhanh.gameworld.domain.usecase.GetGameDetailUsecase
 import com.icongkhanh.gameworld.domain.usecase.GetGameOfGenreUsecase
-import com.icongkhanh.gameworld.model.GameDetailUiModel
-import com.icongkhanh.gameworld.model.ItemGenreUiModel
-import com.icongkhanh.gameworld.model.ItemMoreGameUiModel
-import com.icongkhanh.gameworld.model.ScreenshotModelUi
+import com.icongkhanh.gameworld.domain.usecase.UnBookMarkGameUsecase
+import com.icongkhanh.gameworld.model.*
+import com.icongkhanh.gameworld.util.LogTool
 import com.icongkhanh.gameworld.util.merge
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
@@ -21,25 +20,29 @@ import kotlinx.coroutines.withContext
 
 class GameDetailFragmentViewModel(
     val getGameDetail: GetGameDetailUsecase,
-    val getGameOfGenre: GetGameOfGenreUsecase
+    val getGameOfGenre: GetGameOfGenreUsecase,
+    val bookmarkGame: BookmarkGameUsecase,
+    val unBookMark: UnBookMarkGameUsecase
 ) : ViewModel() {
+
+    private var initGame: Game? = null
 
     private var _game = MutableLiveData<Game>()
 
     val gameUiModel: LiveData<GameDetailUiModel>
-        get() = _game.map {
+        get() = _game.map { game ->
             GameDetailUiModel(
-                name = it.name,
-                rating = it.rating,
-                reviewCount = it.ratingsCount,
-                suggestionCount = it.suggestionsCount,
-                imgUrl = it.imgUrl,
-                clipUrl = it.clipUrl,
-                clipPreviewUrl = it.clipPreviewUrl,
-                description = it.description,
-                recommened = it.platforms.firstOrNull()?.requirementRecommended ?: "",
-                requirement = it.platforms.firstOrNull()?.requirementMin ?: "",
-                listGenre = it.genre.map {
+                name = game.name,
+                rating = game.rating,
+                reviewCount = game.ratingsCount,
+                suggestionCount = game.suggestionsCount,
+                imgUrl = game.imgUrl,
+                clipUrl = game.clipUrl,
+                clipPreviewUrl = game.clipPreviewUrl,
+                description = game.description,
+                recommened = game.platforms.firstOrNull()?.requirementRecommended ?: "",
+                requirement = game.platforms.firstOrNull()?.requirementMin ?: "",
+                listGenre = game.genre.map {
                     ItemGenreUiModel(
                         name = it.name,
                         onClick = {
@@ -47,7 +50,7 @@ class GameDetailFragmentViewModel(
                         }
                     )
                 },
-                listScreenShot = it.screenShort.map {
+                listScreenShot = game.screenShort.map {
                     ScreenshotModelUi(
                         url = it,
                         onClick = {
@@ -56,14 +59,43 @@ class GameDetailFragmentViewModel(
                     )
                 },
                 onClickBuy = {
-                    emitNavigateBuy(it)
+                    emitNavigateBuy(game)
                 },
                 onClickBookMark = {
-                    emitBookmark(it)
+                    LogTool.d("AppLog", "On Click Bookmark: ${bookMark.value}")
+                    viewModelScope.launch {
+                        when (bookMark.value) {
+                            BookMarkGameDetailState.UnBookMarkMode -> {
+                                LogTool.d("AppLog", "unbookmark")
+                                unBookMark(game.id).collect { res ->
+                                    when (res) {
+                                        is Result.Success -> {
+                                            _game.value = _game.value?.copy(
+                                                isBookmark = false
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                            else -> {
+                                LogTool.d("AppLog", "bookmark")
+                                bookmarkGame(game.id).collect { res ->
+                                    when (res) {
+                                        is Result.Success -> {
+                                            _game.value = _game.value?.copy(
+                                                isBookmark = true
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 },
                 onClickClip = {
-                    emitNavigateToViewClip(it.clipUrl)
-                }
+                    emitNavigateToViewClip(game.clipUrl)
+                },
+                isBookmark = game.isBookmark
             )
         }
 
@@ -90,9 +122,15 @@ class GameDetailFragmentViewModel(
     val navigateToBuy: LiveData<Event<Game>>
         get() = _navigateToBuy
 
-    private var _bookMark = MutableLiveData<Event<Game>>()
-    val bookMark: LiveData<Event<Game>>
-        get() = _bookMark
+//    val bookMark: LiveData<BookMarkGameDetailState> = _game.switchMap {
+//            liveData {
+//                emit(if (it.isBookmark) BookMarkGameDetailState.UnBookMarkMode else BookMarkGameDetailState.BookMarkMode)
+//            }
+//        }
+
+    val bookMark = _game.map {
+        if (it.isBookmark) BookMarkGameDetailState.UnBookMarkMode else BookMarkGameDetailState.BookMarkMode
+    }
 
     private var _navigateToViewImage = MutableLiveData<Event<String>>()
     val navigateToViewImage: LiveData<Event<String>>
@@ -111,8 +149,8 @@ class GameDetailFragmentViewModel(
         get() = _navigateToDetail
 
     fun loadGameDetail() {
-        viewModelScope.launch {
-            val id = _game.value?.id
+        viewModelScope.launch(Dispatchers.Default) {
+            val id = initGame?.id
             id?.let {
                 getGameDetail(it)
                     .onEach {
@@ -120,9 +158,9 @@ class GameDetailFragmentViewModel(
                             is Result.Success -> withContext(Dispatchers.Main) {
                                 val data = it.data
                                 data?.let {
-                                    Log.d("GameDetailVM", "before: ${it.stores?.get(0)?.website}")
-                                    val afterMerge = _game.value?.merge(it)
-                                    Log.d("GameDetailVM", "after: ${afterMerge?.stores?.get(0)?.website}")
+                                    LogTool.d("GameDetailVM", "before: ${it}")
+                                    val afterMerge = initGame?.merge(it)
+                                    LogTool.d("GameDetailVM", "after: ${afterMerge}")
                                     _game.value = afterMerge
                                 }
                             }
@@ -143,7 +181,7 @@ class GameDetailFragmentViewModel(
 
     private fun loadMoreGame() {
         viewModelScope.launch {
-            val idGenre = getCurrentGame().genre.firstOrNull()?.id
+            val idGenre = getCurrentGame()?.genre?.firstOrNull()?.id
             idGenre?.let {
                 getGameOfGenre(idGenre).onEach {
                     if (it is Result.Success) {
@@ -154,15 +192,15 @@ class GameDetailFragmentViewModel(
         }
     }
 
-    fun getCurrentGame() = _game.value!!
+    fun getCurrentGame() = _game.value
 
     private fun emitNavigateBuy(game: Game) {
         _navigateToBuy.value = Event(game)
     }
 
-    private fun emitBookmark(game: Game) {
-        _bookMark.value = Event(game)
-    }
+//    private fun emitBookmark(isSuccess: Boolean) {
+//        _bookMark.value = Event(isSuccess)
+//    }
 
     private fun emitNavigateViewImage(url: String) {
         _navigateToViewImage.value = Event(url)

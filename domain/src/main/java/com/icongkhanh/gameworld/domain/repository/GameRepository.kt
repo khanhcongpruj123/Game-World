@@ -10,4 +10,7 @@ interface GameRepository {
     suspend fun searchGame(keyword: String): Flow<Result<List<Game>>>
     suspend fun getGameDetail(id: Long): Flow<Result<Game>>
     suspend fun getGameOfGenre(genreId: Long): Flow<Result<List<Game>>>
+    suspend fun bookmarkGame(id: Long): Flow<Result<Boolean>>
+    suspend fun unBookmarkGame(id: Long): Flow<Result<Boolean>>
+    suspend fun getAllBookmarkGame(): Flow<Result<List<Game>>>
 }

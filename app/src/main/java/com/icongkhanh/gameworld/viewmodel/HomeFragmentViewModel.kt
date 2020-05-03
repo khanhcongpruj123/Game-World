@@ -80,7 +80,7 @@ class HomeFragmentViewModel(
 
     private var page = 1L
 
-    fun start() {
+    init {
         loadGame()
     }
 

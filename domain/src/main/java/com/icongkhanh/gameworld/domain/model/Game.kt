@@ -1,8 +1,6 @@
 package com.icongkhanh.gameworld.domain.model
 
-import android.os.Parcelable
 import java.io.Serializable
-import java.util.*
 
 data class Game(
     val id: Long = 0,
@@ -13,6 +11,7 @@ data class Game(
     val imgUrl: String = "",
     val website: String = "",
     val rating: Float = 0f,
+    val isBookmark: Boolean = false,
     val ratingsCount: Long = 0L,
     val suggestionsCount: Long = 0L,
     val platforms: List<PlatformAndRequirement> = emptyList(),

@@ -2,11 +2,14 @@ package com.icongkhanh.gameworld.data.repository
 
 import android.util.Log
 import com.icongkhanh.common.Result
+import com.icongkhanh.gameworld.data.local.dao.GameDAO
 import com.icongkhanh.gameworld.data.remote.GameService
 import com.icongkhanh.gameworld.data.remote.model.GameResponse
 import com.icongkhanh.gameworld.data.remote.model.SearchGame
 import com.icongkhanh.gameworld.data.utils.StringUtils
 import com.icongkhanh.gameworld.data.utils.mapToDomain
+import com.icongkhanh.gameworld.data.utils.mapToDomainModel
+import com.icongkhanh.gameworld.data.utils.mapToLocalModel
 import com.icongkhanh.gameworld.domain.model.Game
 import com.icongkhanh.gameworld.domain.repository.GameRepository
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 
-class GameRepositoryImpl(val gameService: GameService): GameRepository {
+class GameRepositoryImpl(val gameService: GameService, val gameDAO: GameDAO) : GameRepository {
 
     override suspend fun getAllGame(): Flow<Result<List<Game>>> = flow {
         val page = (1L..20).random()
@@ -78,12 +81,12 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
     override suspend fun getGameDetail(id: Long): Flow<Result<Game>> = flow {
         emit(Result.Loading)
         try {
-            val res = withContext(Dispatchers.IO) {
+            var _res = withContext(Dispatchers.IO) {
                 val _res = gameService.getGameDetail(id)
-                Log.d("Repository", "${_res.stores?.get(0)}")
                 _res
             }.mapToDomain()
-            Log.d("Repository", "${res.stores?.get(0)}")
+            val isBookmark = withContext(Dispatchers.IO) { gameDAO.getGameBookmark(id) != null }
+            val res = _res.copy(isBookmark = isBookmark)
             emit(Result.Success(res))
         } catch (ex: Exception) {
             emit(Result.Error(ex))
@@ -101,6 +104,40 @@ class GameRepositoryImpl(val gameService: GameService): GameRepository {
                 it.genre.map { it.id }.contains(genreId)
             }
             emit(Result.Success(res))
+        } catch (ex: Exception) {
+            emit(Result.Error(ex))
+        }
+    }
+
+    override suspend fun bookmarkGame(id: Long): Flow<Result<Boolean>> = flow {
+        emit(Result.Loading)
+        try {
+            val game = withContext(Dispatchers.IO) { gameService.getGameDetail(id).mapToDomain() }
+            withContext(Dispatchers.IO) { gameDAO.insertBookmarkGame(game.mapToLocalModel()) }
+            emit(Result.Success(true))
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            emit(Result.Error(ex))
+        }
+    }
+
+    override suspend fun unBookmarkGame(id: Long): Flow<Result<Boolean>> = flow {
+        emit(Result.Loading)
+        try {
+            withContext(Dispatchers.IO) { gameDAO.removeBookmarkGame(id) }
+            emit(Result.Success(true))
+        } catch (ex: Exception) {
+            emit(Result.Error(ex))
+        }
+    }
+
+    override suspend fun getAllBookmarkGame(): Flow<Result<List<Game>>> = flow {
+        emit(Result.Loading)
+        try {
+            val list = withContext(Dispatchers.IO) { gameDAO.getAllBookmarkGame() }
+            emit(Result.Success(list.map {
+                it.mapToDomainModel()
+            }))
         } catch (ex: Exception) {
             emit(Result.Error(ex))
         }

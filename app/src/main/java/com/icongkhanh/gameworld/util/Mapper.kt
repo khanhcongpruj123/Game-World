@@ -11,6 +11,7 @@ fun Game.merge(other: Game): Game {
     var genre = if (this.genre.isEmpty()) other.genre else this.genre
     var platforms = if (this.platforms.isEmpty()) other.platforms else this.platforms
     val stores = other.stores
+    val isBookmark = other.isBookmark
 
     return this.copy(
         id = id,
@@ -19,6 +20,7 @@ fun Game.merge(other: Game): Game {
         website = website,
         genre = genre,
         platforms = platforms,
-        stores = stores
+        stores = stores,
+        isBookmark = isBookmark
     )
 }
