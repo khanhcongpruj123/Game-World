@@ -48,6 +48,8 @@ dependencies {
     implementation project(":data")
     implementation project(":common")
 
+    implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha03'
+
     implementation LibrariesDependency.MATERIAL_DESIGN
 
     implementation LibrariesDependency.KOIN_ANDROID

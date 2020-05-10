@@ -15,7 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.transition.Fade
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -30,6 +30,7 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.icongkhanh.common.event.EventObserver
 import com.icongkhanh.common.showOrHide
+import com.icongkhanh.common.widget.endlesscrollrecyclerview.InfiniteScrollListener
 import com.icongkhanh.gameworld.R
 import com.icongkhanh.gameworld.adapter.ListTopGameAdapter
 import com.icongkhanh.gameworld.databinding.FragmentHomeBinding
@@ -37,7 +38,6 @@ import com.icongkhanh.gameworld.domain.model.Game
 import com.icongkhanh.gameworld.util.LogTool
 import com.icongkhanh.gameworld.viewmodel.HomeFragmentViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.viewmodel.ext.android.viewModel
 
@@ -59,8 +59,6 @@ class HomeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        reenterTransition = Fade()
 
         dataSourceFactory = DefaultDataSourceFactory(
             context, Util.getUserAgent(context, "Game World")
@@ -84,14 +82,12 @@ class HomeFragment : Fragment() {
 
         binding.toolbar.setupWithNavController(findNavController())
 
-
         setupListGame()
         setupToolbar()
         setupTopGame()
-        lifecycleScope.launch(Dispatchers.Main) {
-            delay(250)
+        view.postDelayed({
             subscribeUi()
-        }
+        }, 300)
     }
 
     override fun onStart() {
@@ -152,15 +148,30 @@ class HomeFragment : Fragment() {
      * setup listgame recyclerview, notify current position focus and play game clip
      * */
     private fun setupListGame() {
+        val linear = LinearLayoutManager(requireContext())
+        val infiniteScrollListener = object : InfiniteScrollListener(linear) {
+            override fun onLoadMore() {
+                vm.nextPageTopGame()
+            }
+
+            override fun isDataLoading(): Boolean {
+                return vm.isLoading.value?.peek() ?: false
+            }
+
+        }
         listTopGameAdapter =
             ListTopGameAdapter(
                 requireContext(),
                 dataSourceFactory
-            )
+            ).apply {
+                stateRestorationPolicy =
+                    RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
 
-        linearLayoutManager = LinearLayoutManager(requireContext())
+        linearLayoutManager = linear
         binding.listTopGame.apply {
             adapter = listTopGameAdapter
+            addOnScrollListener(infiniteScrollListener)
             layoutManager = linearLayoutManager
         }
     }
@@ -186,30 +197,31 @@ class HomeFragment : Fragment() {
         vm.listTopRatingGameUiModel.observe(viewLifecycleOwner, Observer { listTopGame ->
             listTopGame ?: return@Observer
 
-            binding.listTopGame.postDelayed({
+            binding.root.post {
                 listTopGameAdapter.submitList(listTopGame.list)
-            }, 80)
+            }
         })
 
         //when top rating game changed, updated top rating game
         vm.topRatingGameUiModel.observe(viewLifecycleOwner, Observer { topGame ->
             topGame ?: return@Observer
 
-            playClipTopGame()
+            binding.root.postDelayed({
 
-            binding.nameTopGame.text = topGame.nameGame
+                playClipTopGame()
 
-            binding.starPointTopGameTv.text = topGame.starPoint.toString()
+                binding.nameTopGame.text = topGame.nameGame
 
-            binding.detail.setOnClickListener {
-                topGame.onClickDetail()
-            }
+                binding.starPointTopGameTv.text = topGame.starPoint.toString()
 
-            binding.buy.setOnClickListener {
-                topGame.onClickBuy()
-            }
+                binding.detail.setOnClickListener {
+                    topGame.onClickDetail()
+                }
 
-            binding.thumbnailVideo.postDelayed({
+                binding.buy.setOnClickListener {
+                    topGame.onClickBuy()
+                }
+
                 Glide.with(this)
                     .load(topGame.clipPreviewUrl)
                     .transition(DrawableTransitionOptions.withCrossFade())
@@ -219,19 +231,24 @@ class HomeFragment : Fragment() {
 
         vm.isError.observe(viewLifecycleOwner, EventObserver {
             if (it) {
-                val dialog = MaterialAlertDialogBuilder(requireContext())
-                    .setMessage("No internet!")
-                    .setNegativeButton("Retry") { dialog, which ->
-                        vm.loadGame()
-                    }
-                    .setCancelable(true)
-                    .create()
-                dialog.show()
+                binding.root.post {
+                    val dialog = MaterialAlertDialogBuilder(requireContext())
+                        .setMessage("No internet!")
+                        .setNegativeButton("Retry") { dialog, which ->
+                            vm.loadGame()
+                        }
+                        .setCancelable(true)
+                        .create()
+                    dialog.show()
+                }
             }
         })
 
         vm.isLoading.observe(viewLifecycleOwner, EventObserver {
-            binding.loadingView.showOrHide(it)
+//            binding.loadingView.showOrHide(it)
+            if (it) listTopGameAdapter.dataStartedLoading()
+            else listTopGameAdapter.dataFinishedLoading()
+
         })
     }
 
@@ -248,7 +265,7 @@ class HomeFragment : Fragment() {
 
     fun playClipTopGame() {
 
-        binding.playerView.postDelayed({
+        binding.root.postDelayed({
             Log.d(TAG, "Play clip")
             if (player?.playbackState == Player.STATE_IDLE) {
                 val path = vm.getTopGame()?.clipUrl

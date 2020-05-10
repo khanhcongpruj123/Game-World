@@ -91,7 +91,7 @@ class HomeFragmentViewModel(
                 _isLoading.value = Event(true)
             }
             //loading list top game
-            getTopRatingGame().onEach {
+            getTopRatingGame(page++).onEach {
                 when(it) {
                     is Result.Success -> {
                         withContext(Dispatchers.Main) {
@@ -160,29 +160,31 @@ class HomeFragmentViewModel(
     }
 
     fun nextPageTopGame() {
-//        viewModelScope.launch {
-//            getTopRatingGame(page++).onEach {res ->
-//                when(res) {
-//                    is Result.Success -> {
-//                        withContext(Dispatchers.Main) {
-//                            if (!res.data.isNullOrEmpty()) {
-//                                _listTopRatingGame.value?.let {
-//                                    val listGameTopGame = mutableListOf<Game>()
-//                                    listGameTopGame.addAll(it)
-//                                    listGameTopGame.addAll(res.data)
-//                                    _listTopRatingGame.value = listGameTopGame
-//                                }
-//                            }
-//                        }
-//                    }
-//                    is Result.Error -> {
-//                        withContext(Dispatchers.Main) {
-//                            _isError.value = true
-//                            _isLoading.value = true
-//                        }
-//                    }
-//                }
-//            }.collect()
-//        }
+        _isLoading.value = Event(true)
+        viewModelScope.launch {
+            getTopRatingGame(page++).onEach { res ->
+                when (res) {
+                    is Result.Success -> {
+                        withContext(Dispatchers.Main) {
+                            if (!res.data.isNullOrEmpty()) {
+                                listTopRatingGame.value?.let {
+                                    val listGameTopGame = mutableListOf<Game>()
+                                    listGameTopGame.addAll(it)
+                                    listGameTopGame.addAll(res.data)
+                                    listTopRatingGame.value = listGameTopGame
+                                }
+                            }
+                        }
+                        _isLoading.value = Event(false)
+                    }
+                    is Result.Error -> {
+                        withContext(Dispatchers.Main) {
+                            _isError.value = Event(true)
+                            _isLoading.value = Event(true)
+                        }
+                    }
+                }
+            }.collect()
+        }
     }
 }

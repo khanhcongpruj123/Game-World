@@ -101,7 +101,9 @@ class GameDetailFragment() : Fragment() {
         setupListMoregame()
         setupGenre()
 
-        subscribeUi()
+        view.post {
+            subscribeUi()
+        }
     }
 
     private fun setupListMoregame() {
